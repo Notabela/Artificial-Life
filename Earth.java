@@ -25,8 +25,8 @@ public class Earth
     private static int initHerbivore;    // initial number of herbivores on earth
     private static int initCarnivore;   // initial number of carnivores on earth
 
-    public static int globalWidth;     //globally available width of earth instance
-    public static int globalHeight;   //height of earth instance with default value
+    public static int globalWidth = 20;     //globally available width of earth instance S- 20 as default for testing
+    public static int globalHeight = 20;   //height of earth instance with default value
 
     private int width;    //width of an earth object
     private int height;   //height of an earth object
