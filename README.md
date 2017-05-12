@@ -2,26 +2,24 @@
 
 Simulation of an earth containing plants and animals
 
-The following **required** functionality is completed:
+run Simulation.java
 
-- [ ] 
-- [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
+The following **requirements** are completed:
 
-The following **optional** features are yet to be implemented:
-- [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
-- [ ]
+- [ ] Use Interfaces
+- [ ] Use generic programming or generic Collection
+- [X] Use polymorphism
+- [X] Use inheritance where necessary
+- [X] Use encapsulation for all classes
+- [ ] Implementation throws or handles exceptions
+- [ ] Implementation uses File Processing
+- [ ] Simulation uses a GUI
+
+The following **optional** features are implemented:
+- [ ] Animals are intelligent (have memory)
+- [ ] Include more features into the Simulation such as water, obstacles, different plants, etc.
+- [ ] GUI displays skull before Animal dies
+- [ ] User can save/load game state
 
 
 ## Notes
