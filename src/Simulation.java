@@ -6,6 +6,8 @@
  * @version 2.0 3/31/2017
  */
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.Scanner;
 
 public class Simulation
@@ -34,16 +36,21 @@ public class Simulation
         maxIterations = scanner.nextInt();
 
         Earth.initialize(userWidth, userHeight);
+        GridInterface frame = new GridInterface();
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setSize(750,750);
+        frame.addComponents(frame.getContentPane());
+        frame.setVisible(true);
 
         //Game ends when iterations = maxIterations
         for(int iteration = 1; iteration <= maxIterations; iteration++)
         {
             Earth.simulate(iteration);
             System.out.println(Earth.getInstance());
-
+            //TODO: Call a function that refreshes GUI with latest instance
             try
             {
-                Thread.sleep(1000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
