@@ -23,9 +23,10 @@ public class GridInterface extends JFrame {
     private final Container container;
     private final JPanel panel;
 
+
     public GridInterface()
     {
-        super("Demo");
+        super("Earth");
         gridLayout = new GridLayout(Earth.width,Earth.height);
         container = getContentPane();
         setLayout(gridLayout);
@@ -35,26 +36,31 @@ public class GridInterface extends JFrame {
         panel.setLayout(new GridLayout(1,panelButtons.length));
 
         //TODO: Change the logic for our objects.
-        for (int i = 0; i < Earth.width * Earth.height; i++) {
-            //TODO: Statement for herbivore
-            if (i < 100) {
-                buttons[i] = new JButton((icons[0]));
-                add(buttons[i]);
-            }
-            //TODO: Statement for carnivore
-            else if (i >= 100 && i < 200) {
-                buttons[i] = new JButton((icons[1]));
-                add(buttons[i]);
-            }
-            //TODO: Statement for plant
-            else if (i >= 200 && i < 300) {
-                buttons[i] = new JButton((icons[2]));
-                add(buttons[i]);
-            }
-            //TODO: Statement for free space
-            else if (i >= 300 && i < 400) {
-                buttons[i] = new JButton((icons[3]));
-                add(buttons[i]);
+        for (int i = 0; i < Earth.width; i++) {
+            for (int j = 0; j < Earth.height; j++) {
+
+                Organism organismAt = Organism.earth.getOrganismAt(i, j);
+
+                //TODO: Statement for herbivore
+                if (organismAt instanceof Herbivore) {
+                    buttons[i] = new JButton((icons[0]));
+                    add(buttons[i]);
+                }
+                //TODO: Statement for carnivore
+                else if (organismAt instanceof Carnivore) {
+                    buttons[i] = new JButton((icons[1]));
+                    add(buttons[i]);
+                }
+                //TODO: Statement for plant
+                else if (organismAt instanceof Plant) {
+                    buttons[i] = new JButton((icons[2]));
+                    add(buttons[i]);
+                }
+                //TODO: Statement for free space
+                else if (organismAt == null) {
+                    buttons[i] = new JButton((icons[3]));
+                    add(buttons[i]);
+                }
             }
         }
 

@@ -8,9 +8,6 @@ import java.awt.*;
 //This class will be moved to Simulation class once ready.
 public class GuiDemo {
     public static void main(String[] args) {
-        GridInterface grid = new GridInterface();
-        grid.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        grid.setSize(750,750);
-        grid.setVisible(true);
+
     }
 }
