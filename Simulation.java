@@ -10,7 +10,6 @@ import java.util.Scanner;
 
 public class Simulation
 {
-
     public static void main(String[] args)
     {
         Scanner scanner = new Scanner(System.in);
@@ -35,6 +34,19 @@ public class Simulation
         maxIterations = scanner.nextInt();
 
         Earth.initialize(userWidth, userHeight);
-        Earth.beginSimulation(maxIterations);
+
+        //Game ends when iterations = maxIterations
+        for(int iteration = 1; iteration <= maxIterations; iteration++)
+        {
+            Earth.simulate(iteration);
+            System.out.println(Earth.getInstance());
+
+            try
+            {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

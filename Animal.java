@@ -9,7 +9,7 @@ import java.util.Collections;
  * @author Daniel Obeng
  * @version 1.0 3/31/2017
  */
-public abstract class Animal extends Organism
+public abstract class Animal extends Organism implements Movable
 {
     private static SecureRandom rand = new SecureRandom(); //random numbers generator
 
@@ -133,6 +133,7 @@ public abstract class Animal extends Organism
      * @param x represents x location animal should move to
      * @param y represents y location animal should move to
      */
+    @Override
     public void moveTo(int x, int y)
     {
         isActive = true;

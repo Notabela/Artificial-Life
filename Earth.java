@@ -1,5 +1,7 @@
+import java.io.*;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+
 /**
  * Earth.java
  * Purpose: defines Earth on which Entities will sit (Designed as a singleton)
@@ -7,7 +9,7 @@ import java.util.ArrayList;
  * @author Daniel Obeng
  * @version 1.0 3/31/2017
  */
-public class Earth
+public class Earth implements Serializable
 {
 
     //these constants are made available here to make changing how the earth is quick and easy
@@ -17,21 +19,24 @@ public class Earth
     private static final int maxHerbivoreIter = 3;  // iterations after which carnivore moves
     private static final int minPlantIter  = 3;  // min iterations after which new plant grows
     private static final int maxPlantIter  = 5;  // max iterations after which new plant grows
+
     private static SecureRandom randomNumbers = new SecureRandom(); //random number generator
 
-    private static final int sleepTime = 1000;   // wait time of main loop to limit speed of game
+    //Iteration at which plant/herbivore/carnivore move
+    private static int plantIter = minPlantIter + randomNumbers.nextInt(maxPlantIter - minPlantIter + 1);
+    private static int herbivoreIter = minHerbivoreIter + randomNumbers.nextInt(maxHerbivoreIter - minHerbivoreIter + 1);
+    private static int carnivoreIter = minCarnivoreIter + randomNumbers.nextInt(maxCarnivoreIter - minCarnivoreIter + 1);
 
     private static int initPlants;       // initial number of plants on earth
     private static int initHerbivore;    // initial number of herbivores on earth
     private static int initCarnivore;   // initial number of carnivores on earth
 
-    public static int globalWidth = 20;     //globally available width of earth instance S- 20 as default for testing
-    public static int globalHeight = 20;   //height of earth instance with default value
-
-    private int width;    //width of an earth object
-    private int height;   //height of an earth object
+    public static int width = 20;     //globally available width of earth instance S- 20 as default for testing
+    public static int height = 20;   //height of earth instance with default value
 
     private static Earth instance; //reference to the only instance of earth in program
+
+    SaveGame save = new SaveGame();
     private Organism[][] grid;
 
     /**
@@ -42,29 +47,19 @@ public class Earth
     {
         if ( instance != null ) return;
 
-        globalWidth = width;
-        globalHeight = height;
+        Earth.width = width;
+        Earth.height = height;
     }
 
     /**
      * Private constructor to enforce Singleton design
      */
-    private Earth()
-    {
-        width = globalWidth;
-        height = globalHeight;
-        grid = new Organism[globalHeight][globalWidth];
-    }
+    private Earth() { grid = new Organism[height][width]; }
 
     /**
      * Private copy constructor to allow overwriting of earth
      */
-    private Earth(Earth other)
-    {
-        globalWidth = width = other.width;
-        globalHeight = height = other.height;
-        grid = other.grid;
-    }
+    private Earth(Earth other) { grid = other.grid; }
 
     /**
      * Get organism at location x and y
@@ -100,6 +95,22 @@ public class Earth
     }
 
     /**
+     * Save game //TODO
+     */
+    public static void saveGameState()
+    {
+        getInstance().save.saveGameState();
+    }
+
+    /**
+     * Load game //TODO
+     */
+    public static void LoadGameState()
+    {
+        getInstance().save.loadFromSave();
+    }
+
+    /**
      * static method to overwrite earth's single instance with another object
      * @param earth Earth object to overwrite default object with
      */
@@ -125,8 +136,8 @@ public class Earth
         //MARK: initialize Plants
         for(int i = 0; i < initPlants; )
         {
-            int randX = randomNumbers.nextInt(globalHeight);
-            int randY = randomNumbers.nextInt(globalWidth);
+            int randX = randomNumbers.nextInt(Earth.height);
+            int randY = randomNumbers.nextInt(Earth.width);
 
             if(earth.getOrganismAt(randX, randY) == null)
             {
@@ -138,8 +149,8 @@ public class Earth
         //MARK: initialize Herbivores
         for(int i = 0; i < initHerbivore; )
         {
-            int randX = randomNumbers.nextInt(globalHeight);
-            int randY = randomNumbers.nextInt(globalWidth);
+            int randX = randomNumbers.nextInt(Earth.height);
+            int randY = randomNumbers.nextInt(Earth.width);
 
             if(earth.getOrganismAt(randX, randY) == null)
             {
@@ -151,8 +162,8 @@ public class Earth
         //MARK: Initialize Carnivores
         for(int i = 0; i < initCarnivore; )
         {
-            int randX = randomNumbers.nextInt(globalHeight);
-            int randY = randomNumbers.nextInt(globalWidth);
+            int randX = randomNumbers.nextInt(Earth.height);
+            int randY = randomNumbers.nextInt(Earth.width);
 
             if(earth.getOrganismAt(randX, randY) == null)
             {
@@ -168,9 +179,9 @@ public class Earth
      */
     private static void activateCarnivores()
     {
-        for (int i = 0; i < Earth.globalHeight; i++)
+        for (int i = 0; i < Earth.height; i++)
         {
-            for (int j = 0; j < Earth.globalWidth; j++)
+            for (int j = 0; j < Earth.width; j++)
             {
                 Organism organism = Earth.getInstance().getOrganismAt(i, j);
                 if (organism instanceof Carnivore && !((Carnivore) organism).isActive) organism.activate();
@@ -183,9 +194,9 @@ public class Earth
      */
     private static void activateHerbivores()
     {
-        for (int i = 0; i < Earth.globalHeight; i++)
+        for (int i = 0; i < Earth.height; i++)
         {
-            for (int j = 0; j < Earth.globalWidth; j++)
+            for (int j = 0; j < Earth.width; j++)
             {
                 Organism organism = Earth.getInstance().getOrganismAt(i, j);
                 if (organism instanceof Herbivore && !((Herbivore) organism).isActive) organism.activate();
@@ -200,9 +211,9 @@ public class Earth
     {
         Earth earth = Earth.getInstance();
 
-        for (int i = 0; i < Earth.globalHeight; i++)
+        for (int i = 0; i < Earth.height; i++)
         {
-            for (int j = 0; j < Earth.globalWidth; j++)
+            for (int j = 0; j < Earth.width; j++)
             {
                 Organism organism = earth.getOrganismAt(i, j);
                 if (organism instanceof Plant) organism.activate();
@@ -221,21 +232,8 @@ public class Earth
     /**
      * Method to start the Earth Simulation
      */
-    public static void beginSimulation(int maxIterations)
+    public static void simulate(int iteration)
     {
-
-        int iteration = 1;
-
-        //iteration for organisms to increase randomness
-        int plantIter = minPlantIter + randomNumbers.nextInt(maxPlantIter - minPlantIter + 1);
-        int herbivoreIter = minHerbivoreIter + randomNumbers.nextInt(maxHerbivoreIter - minHerbivoreIter + 1);
-        int carnivoreIter = minCarnivoreIter + randomNumbers.nextInt(maxCarnivoreIter - minCarnivoreIter + 1);
-
-        //Game ends when iterations = maxIterations
-        while (iteration <= maxIterations)
-        {
-            System.out.println(Earth.getInstance() + "\n");
-
             if (iteration % carnivoreIter == 0)
             {
                 activateCarnivores();
@@ -254,16 +252,6 @@ public class Earth
 
             ageAnimals();
             deactivateAnimals();
-            iteration++;
-
-            //pause to prevent game from moving too fast
-            try
-            {
-                Thread.sleep(sleepTime);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**
@@ -271,9 +259,9 @@ public class Earth
      */
     private static void ageAnimals()
     {
-        for (int i = 0; i < Earth.globalHeight; i++)
+        for (int i = 0; i < Earth.height; i++)
         {
-            for (int j = 0; j < Earth.globalWidth; j++)
+            for (int j = 0; j < Earth.width; j++)
             {
                 Organism organism = Earth.getInstance().getOrganismAt(i, j);
                 if (organism != null) organism.increaseAge();
@@ -286,9 +274,9 @@ public class Earth
      */
     private static void deactivateAnimals()
     {
-        for (int i = 0; i < Earth.globalHeight; i++)
+        for (int i = 0; i < Earth.height; i++)
         {
-            for (int j = 0; j < Earth.globalWidth; j++)
+            for (int j = 0; j < Earth.width; j++)
             {
                 Organism organism = Earth.getInstance().getOrganismAt(i, j);
                 if (organism instanceof Animal) ((Animal) organism).deactivate();
@@ -353,6 +341,86 @@ public class Earth
         }
 
         return sb.toString();
+    }
+
+    class SaveGame implements Serializable
+    {
+        private String fileName;
+        private File file;
+
+        public SaveGame()
+        {
+            fileName = "save.bin";
+            file = new File(fileName);
+        }
+
+        public boolean loadFromSave()
+        {
+            try (FileInputStream fstream = new FileInputStream(file)) {
+                ObjectInputStream istream = new ObjectInputStream(fstream);
+
+                initPlants = istream.readInt();
+                initHerbivore = istream.readInt();
+                initCarnivore = istream.readInt();
+                plantIter = istream.readInt();
+                carnivoreIter = istream.readInt();
+                herbivoreIter = istream.readInt();
+                width = istream.readInt();
+                height = istream.readInt();
+
+                Earth.overwriteInstance((Earth)istream.readObject());
+
+                istream.close();
+
+                return true;
+            } catch (FileNotFoundException e) {
+                System.out.println("Error: Unable to Load " + file.toString());
+                ///GUI.displayError("Error: " + file.toString() + " not found")
+                return false;
+            } catch (IOException e) {
+                System.out.println("Error: unable to load " + file.toString());
+                ///GUI.displayError("Error: ");
+                return false;
+            } catch (ClassNotFoundException e) {
+                System.out.println("Error: Corrupt Save File");
+                throw( new RuntimeException()); //Game should Quit
+            }
+        }
+
+        public boolean saveGameState()
+        {
+            try ( FileOutputStream fstream = new FileOutputStream(file))
+            {
+               ObjectOutputStream ostream = new ObjectOutputStream(fstream);
+
+               //Write Constants
+                ostream.writeInt(initPlants);
+                ostream.writeInt(initHerbivore);
+                ostream.writeInt(initCarnivore);
+                ostream.writeInt(plantIter);
+                ostream.writeInt(carnivoreIter);
+                ostream.writeInt(herbivoreIter);
+                ostream.writeInt(width);
+                ostream.writeInt(height);
+
+                //then Write game objects
+                ostream.writeObject(getInstance());
+
+               ostream.close();
+            } catch (FileNotFoundException e)
+            {
+                System.out.println("Error: Unable to save GameState");
+                ///GUI.displayError("Error: " + file.toString() + " not found")
+                return false;
+            } catch (IOException e)
+            {
+                System.out.println(e);
+                System.out.println("Error: unable to save to" + file.toString());
+                ///GUI.displayError("Error: ");
+                return false;
+            }
+            return false;
+        }
     }
 
 }

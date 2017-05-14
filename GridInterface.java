@@ -26,16 +26,16 @@ public class GridInterface extends JFrame {
     public GridInterface()
     {
         super("Demo");
-        gridLayout = new GridLayout(Earth.globalWidth,Earth.globalHeight);
+        gridLayout = new GridLayout(Earth.width,Earth.height);
         container = getContentPane();
         setLayout(gridLayout);
-        buttons = new JButton[Earth.globalHeight*Earth.globalWidth];
+        buttons = new JButton[Earth.height *Earth.width];
         panelButtons = new JButton[5];
         panel = new JPanel();
         panel.setLayout(new GridLayout(1,panelButtons.length));
 
         //TODO: Change the logic for our objects.
-        for (int i = 0; i < Earth.globalWidth * Earth.globalHeight; i++) {
+        for (int i = 0; i < Earth.width * Earth.height; i++) {
             //TODO: Statement for herbivore
             if (i < 100) {
                 buttons[i] = new JButton((icons[0]));

@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.security.SecureRandom;
 
 /**
@@ -7,7 +8,7 @@ import java.security.SecureRandom;
  * @author Daniel Obeng
  * @version 1.0 3/31/2017
  */
-public abstract class Organism
+public abstract class Organism implements Serializable
 {
     //constants for animal implementation purposes
     //these constants are made available here to make changing how an animal behaves quick and easy
