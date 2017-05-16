@@ -6,39 +6,29 @@
  * @version 2.0 3/31/2017
  */
 
+import jdk.nashorn.internal.scripts.JO;
+
 import javax.swing.*;
-import java.awt.*;
 import java.util.Scanner;
 
 public class Simulation
 {
     public static void main(String[] args)
     {
-        Scanner scanner = new Scanner(System.in);
 
-        //Get Earth width
-        int userWidth, userHeight, maxIterations;
-        do
-        {
-            System.out.print("Enter a Width >= 5: ");
-            userWidth = scanner.nextInt();
-        } while (userWidth < 5);
+        String firstText = JOptionPane.showInputDialog("Enter desired Earth width (>= 5)");
+        String secondText = JOptionPane.showInputDialog("Enter desired Earth height (>= 5)");
+        //String thirdText = JOptionPane.showInputDialog("Enter number of iterations");
 
-        //Get Earth height
-        do
-        {
-            System.out.print("Enter a Height >= 5: ");
-            userHeight = scanner.nextInt();
-        } while (userHeight < 5);
+        int userWidth = Integer.parseInt(firstText);
+        int userHeight = Integer.parseInt(secondText);
+        //int maxIterations = Integer.parseInt(thirdText);
 
-        //Get number of iterations
-        System.out.print("Enter the number of iterations: ");
-        maxIterations = scanner.nextInt();
+        int maxIterations = Integer.MAX_VALUE;
 
         Earth.initialize(userWidth, userHeight);
         GridInterface frame = new GridInterface();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(750,750);
         frame.addComponents(frame.getContentPane());
         frame.setVisible(true);
 
@@ -48,9 +38,10 @@ public class Simulation
             Earth.simulate(iteration);
             System.out.println(Earth.getInstance());
             //TODO: Call a function that refreshes GUI with latest instance
+            frame.renew();
             try
             {
-                Thread.sleep(2000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

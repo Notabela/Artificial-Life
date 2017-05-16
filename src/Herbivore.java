@@ -40,6 +40,7 @@ public class Herbivore extends Animal
            energy += energyGainPerFeed;
            int newX = organism.getX(), newY = organism.getY();
            organism.die();
+           feedCount++;
            moveTo(newX, newY);
            return true;
         }

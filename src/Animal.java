@@ -25,6 +25,7 @@ public abstract class Animal extends Organism implements Movable
     private static final int highestCanBirthAge   = 30 + rand.nextInt(60 - 30 + 1);  // highest age at which animal can still give birth
 
     protected double energy = initialEnergy;
+    protected int feedCount = 0;
 
     //helper bool to keep track of if animal was moved during the current iteration
     //This will ensure that organism isn't moved twice in the earth array at each iteration

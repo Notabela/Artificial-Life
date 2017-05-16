@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
  */
 public class GridInterface extends JFrame {
 
-    private JButton[] buttons;
     JButton saveButton = new JButton("Save");
     JButton loadButton = new JButton("Load");
     JButton exitButton = new JButton("Exit");
@@ -24,17 +23,20 @@ public class GridInterface extends JFrame {
             new ImageIcon(getClass().getResource(object[3]))
     };
 
+    JPanel grid = new JPanel();
+    JPanel panel = new JPanel();
+    JButton[] buttons = new JButton[Earth.height *Earth.width];
+
     public GridInterface()
     {
         super("Earth");
+        setSize(Earth.height*50,Earth.width*68);
     }
 
     public void addComponents(final Container pane) {
-        JPanel grid = new JPanel();
+
         grid.setLayout(new GridLayout(Earth.width, Earth.height));
-        JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(0,3));
-        buttons = new JButton[Earth.height *Earth.width];
 
         addObjects(grid);
 
@@ -51,6 +53,7 @@ public class GridInterface extends JFrame {
             }
         });
 
+        //TODO: Get this method to load state onto GUI
         loadButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -71,37 +74,73 @@ public class GridInterface extends JFrame {
         pane.add(panel, BorderLayout.SOUTH);
     }
 
-    private void addObjects(Container jPanel) {
+    private void addObjects(JPanel frame) {
         for (int i = 0; i < Earth.width; i++) {
             for (int j = 0; j < Earth.height; j++) {
 
                 Organism organismAt = Organism.earth.getOrganismAt(i, j);
 
+                //TODO: Create GUI that shows data of object (Energy and Age)
                 if (organismAt instanceof Herbivore) {
                     buttons[i] = new JButton((icons[0]));
-                    jPanel.add(buttons[i]);
+                    frame.add(buttons[i]);
+
+                    buttons[i].addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            JOptionPane.showMessageDialog(null, "Energy: " + ((Herbivore) organismAt).energy + "\n"
+                                    + "Age: " + organismAt.age + "\n" + "Fed: " + ((Herbivore) organismAt).feedCount + " times \n\n" );
+                        }
+                    });
                 }
 
                 else if (organismAt instanceof Carnivore) {
                     buttons[i] = new JButton((icons[1]));
-                    jPanel.add(buttons[i]);
+                    frame.add(buttons[i]);
+
+                    buttons[i].addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            JOptionPane.showMessageDialog(null, "Energy: " + ((Carnivore) organismAt).energy + "\n"
+                                    + "Age: " + organismAt.age + "\n" + "Fed: " + ((Carnivore) organismAt).feedCount + " times \n\n" );
+                        }
+                    });
                 }
 
                 else if (organismAt instanceof Plant) {
                     buttons[i] = new JButton((icons[2]));
-                    jPanel.add(buttons[i]);
+                    frame.add(buttons[i]);
+
+                    buttons[i].addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            JOptionPane.showMessageDialog(null, "Energy: N/A \n"
+                                    + "Age: " + organismAt.age + "\n\n");
+                        }
+                    });
                 }
 
                 else if (organismAt == null) {
                     buttons[i] = new JButton((icons[3]));
-                    jPanel.add(buttons[i]);
+                    frame.add(buttons[i]);
+
+                    buttons[i].addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            JOptionPane.showMessageDialog(null, "Energy: N/A \n"
+                                    + "Age: N/A \n\n");
+                        }
+                    });
                 }
             }
         }
     }
 
-    //TODO: Get this to refresh the GUI to latest instance
     public void renew() {
+
+        this.grid.removeAll();
+
+        addObjects(grid);
 
         this.revalidate();
         this.repaint();
