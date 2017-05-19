@@ -14,8 +14,8 @@ public class GridInterface extends JFrame {
 
     //Add more images for obstacles. Maximum size 50px x 50px
     private static final String[] object = {
-            "herbivore.gif", "carnivore.gif", "plant.gif",
-            "free.gif"};
+            "media/herbivore.gif", "media/carnivore.gif", "media/plant.gif",
+            "media/free.gif"};
     private final Icon[] icons = {
             new ImageIcon(getClass().getResource(object[0])),
             new ImageIcon(getClass().getResource(object[1])),
