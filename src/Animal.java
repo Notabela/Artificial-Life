@@ -16,37 +16,40 @@ public abstract class Animal extends Organism implements Movable
     //constants for animal implementation purposes
     //these constants are made available here to make changing how an animal behaves quick and easy
     protected static final int initialEnergy      = 3;   // initial energy of animal
-    private static final double energyLostPerMove = 0.1; // energy animal loses per move
+    private static final double energyLostPerMove = 0.2; // energy animal loses per move
 
     protected static final int maxEnergy          = 5 + rand.nextInt(10 - 5 + 1);  // energy at which animal can no longer feed
-    protected static final int energyGainPerFeed  = 2 + rand.nextInt(4 - 2 + 1); // energy animal gains per feed
+    //protected static final int energyGainPerFeed  = 2 + rand.nextInt(4 - 2 + 1); // energy animal gains per feed
     private static final int energyCanGiveBirth   = 4 + rand.nextInt(6 - 4 + 1);   // energy at which animal can start giving birth
-    private static final int lowestCanBirthAge    = 5 + rand.nextInt(20 - 5 + 1);  // lowest age at which animal can give birth
-    private static final int highestCanBirthAge   = 30 + rand.nextInt(60 - 30 + 1);  // highest age at which animal can still give birth
+    private static final int lowestCanBirthAge    = 20 + rand.nextInt(30 - 5 + 1);  // lowest age at which animal can give birth
+    private static final int highestCanBirthAge   = 50 + rand.nextInt(100 - 30 + 1);  // highest age at which animal can still give birth
 
-    protected double energy = initialEnergy;
-    protected int feedCount = 0;
+    protected int feedCount = 0;             //amount of times animal has fed
 
     //helper bool to keep track of if animal was moved during the current iteration
     //This will ensure that organism isn't moved twice in the earth array at each iteration
     public boolean isActive = false;
 
     //Protected constructor for subclasses
-    protected Animal(int x, int y) { super(x, y); }
+    protected Animal(int x, int y)
+    {
+        super(x, y);
+        energy = initialEnergy;
+    }
 
     /**
      * Method to cause animal to try to feed on an organism
-     * @param organism refers to the organism that animal should try to feed on
+     * @param entity refers to the organism that animal should try to feed on
      * @return true if animal successfully fed on the organism
      */
-    public abstract boolean feedOn(Organism organism);
+    public abstract boolean feedOn(Entity entity);
 
     /**
      * Method to check if organism is this animal's prey
-     * @param organism refers to the organism to checked for
+     * @param entity refers to the entity to checked for
      * @return true if organism is this animal's prey
      */
-    public abstract boolean isPrey(Organism organism);
+    public abstract boolean isPrey(Entity entity);
 
     /**
      * Abstract method to make animal give birth at x,y
@@ -80,31 +83,40 @@ public abstract class Animal extends Organism implements Movable
         ArrayList<int[]> locations = earth.getLocationsAround(this);
         Collections.shuffle(locations);
 
+        boolean fedOnPrey = false;
+
         // If animal's energy is less than its initial energy, it should feed if possible
-        if (energy < initialEnergy)
+        if (energy <= initialEnergy)
         {
             for (int[] location : locations)
             {
-                Organism organism = earth.getOrganismAt(location[0], location[1]);
-                if ( isPrey(organism) )
+                Entity entity = earth.getEntityAt(location[0], location[1]);
+                if ( isPrey(entity) )
                 {
                     //if feedOn(organism) returns false, then animals has too much energy
                     //i.e we already ensured organism is prey of this
-                    if ( feedOn(organism) ) return;
+                    if ( feedOn(entity) )
+                    {
+                        fedOnPrey = true;
+                        break;
+                    }
                     else break;
                 }
             }
         }
 
-        for (int[] location : locations)
+        //Animal couldn't feed, lets try to move to a location
+        if(!fedOnPrey)
         {
-            Organism organism = earth.getOrganismAt(location[0], location[1]);
-            if (organism == null)
+            for (int[] location : locations)
             {
-                moveTo(location[0], location[1]);
-                return;
+                Entity entity = earth.getEntityAt(location[0], location[1]);
+                if (entity == null)
+                {
+                    moveTo(location[0], location[1]);
+                    break;
+                } else if (feedOn(entity)) break;
             }
-            else if ( feedOn(organism) ) return;
         }
 
         if ( canGiveBirth() )
@@ -118,7 +130,7 @@ public abstract class Animal extends Organism implements Movable
             {
                 int x = adjacentLocations.get(i)[0];
                 int y = adjacentLocations.get(i)[1];
-                if(earth.getOrganismAt(x, y) != null)
+                if(earth.getEntityAt(x, y) == null)
                 {
                     giveBirthAt(x, y);
                     break;
@@ -144,6 +156,11 @@ public abstract class Animal extends Organism implements Movable
         locationY = y;
         earth.set(x, y,this);
     }
+
+    /**
+     * Method to increase the age of an organism
+     */
+    public void increaseAge() { age++; }
 
     /**
      * Helper method to reset animal's moved var. Check Moved var comment for more details

@@ -9,6 +9,9 @@ public class Plant extends Organism
 {
     public Plant(int x, int y) { super(x, y); }
 
+    /**
+     *
+     */
     @Override
     public void activate()
     {
@@ -20,4 +23,13 @@ public class Plant extends Organism
      */
     @Override
     public String toString() { return "*"; }
+
+    /*
+     *
+     */
+    public void grow()
+    {
+        age++;
+        energy += 0.2;
+    }
 }

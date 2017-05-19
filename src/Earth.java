@@ -22,6 +22,8 @@ public class Earth implements Serializable
 
     private static SecureRandom randomNumbers = new SecureRandom(); //random number generator
 
+    private enum EntityType { CARNIVORE, HERBIVORE, PLANT, OBSTACLE, LAKE }
+
     //Iteration at which plant/herbivore/carnivore move
     private static int plantIter = minPlantIter + randomNumbers.nextInt(maxPlantIter - minPlantIter + 1);
     private static int herbivoreIter = minHerbivoreIter + randomNumbers.nextInt(maxHerbivoreIter - minHerbivoreIter + 1);
@@ -30,6 +32,8 @@ public class Earth implements Serializable
     private static int initPlants;       // initial number of plants on earth
     private static int initHerbivore;    // initial number of herbivores on earth
     private static int initCarnivore;   // initial number of carnivores on earth
+    private static int initObstacles;   // initial number of obstacles
+    private static int initLakes;       // initial number of lakes
 
     public static int width = 20;     //globally available width of earth instance S- 20 as default for testing
     public static int height = 20;   //height of earth instance with default value
@@ -37,7 +41,7 @@ public class Earth implements Serializable
     private static Earth instance; //reference to the only instance of earth in program
 
     SaveGame save = new SaveGame();
-    private Organism[][] grid;
+    private Entity[][] grid;
 
     /**
      * Overwrite Earth instance width and height - can only be done when earth
@@ -54,7 +58,7 @@ public class Earth implements Serializable
     /**
      * Private constructor to enforce Singleton design
      */
-    private Earth() { grid = new Organism[height][width]; }
+    private Earth() { grid = new Entity[height][width]; }
 
     /**
      * Private copy constructor to allow overwriting of earth
@@ -67,20 +71,20 @@ public class Earth implements Serializable
      * @param y y-location of organism
      * @return Organism at x,y
      */
-    public Organism getOrganismAt(int x, int y)
+    public Entity getEntityAt(int x, int y)
     {
         return grid[x][y];
     }
 
     /**
-     * Set location x,y on earth grid to organism
+     * Set location x,y on earth grid to entity
      * @param x x-location
      * @param y y-location
-     * @param organism organism to place at location x,y
+     * @param entity entity to place at location x,y
      */
-    public void set(int x, int y, Organism organism)
+    public void set(int x, int y, Entity entity)
     {
-        grid[x][y] = organism;
+        grid[x][y] = entity;
     }
 
     /**
@@ -129,77 +133,72 @@ public class Earth implements Serializable
         initPlants = width + width/2;
         initHerbivore = width;
         initCarnivore = width/2;
+        initObstacles = width/3;
 
         setSize(width, height);   //set earth's width and size
-        Earth earth = Earth.getInstance(); //get/create instance of earth
 
-        //MARK: initialize Plants
-        for(int i = 0; i < initPlants; )
-        {
-            int randX = randomNumbers.nextInt(Earth.height);
-            int randY = randomNumbers.nextInt(Earth.width);
-
-            if(earth.getOrganismAt(randX, randY) == null)
-            {
-                earth.set(randX, randY, new Plant(randX, randY));
-                i++;
-            }
-        }
-
-        //MARK: initialize Herbivores
-        for(int i = 0; i < initHerbivore; )
-        {
-            int randX = randomNumbers.nextInt(Earth.height);
-            int randY = randomNumbers.nextInt(Earth.width);
-
-            if(earth.getOrganismAt(randX, randY) == null)
-            {
-                earth.set(randX, randY, new Herbivore(randX, randY));
-                i++;
-            }
-        }
-
-        //MARK: Initialize Carnivores
-        for(int i = 0; i < initCarnivore; )
-        {
-            int randX = randomNumbers.nextInt(Earth.height);
-            int randY = randomNumbers.nextInt(Earth.width);
-
-            if(earth.getOrganismAt(randX, randY) == null)
-            {
-                earth.set(randX, randY, new Carnivore(randX, randY));
-                i++;
-            }
-        }
-
+        fillEarth(EntityType.CARNIVORE, initCarnivore);
+        fillEarth(EntityType.HERBIVORE, initHerbivore);
+        fillEarth(EntityType.PLANT, initPlants);
+        fillEarth(EntityType.OBSTACLE, initLakes);
     }
 
     /**
-     * Method to activate each Carnivore
+     * Precondition: ensure amount <= earth.freelocations
+     * @param entityType
+     * @param amount
      */
-    private static void activateCarnivores()
+    private static void fillEarth(EntityType entityType, int amount)
+    {
+        for(int i = 0; i < amount & i <= Earth.height*Earth.width; )
+        {
+            int randX = randomNumbers.nextInt(Earth.height);
+            int randY = randomNumbers.nextInt(Earth.width);
+
+            if(Earth.getInstance().getEntityAt(randX, randY) == null)
+            {
+                switch (entityType)
+                {
+                    case CARNIVORE:
+                        Earth.getInstance().set(randX, randY, new Carnivore(randX, randY));
+                        break;
+                    case HERBIVORE:
+                        Earth.getInstance().set(randX, randY, new Herbivore(randX, randY));
+                        break;
+                    case PLANT:
+                        Earth.getInstance().set(randX, randY, new Plant(randX, randY));
+                        break;
+                    case LAKE:
+                        Earth.getInstance().set(randX, randY, new Lake(randX, randY));
+                        break;
+                    case OBSTACLE:
+                        Earth.getInstance().set(randX, randY, new Obstacle(randX, randY));
+                        break;
+                }
+                i++;
+            }
+        }
+    }
+
+    private static void activateOrganism(EntityType entityType)
     {
         for (int i = 0; i < Earth.height; i++)
         {
             for (int j = 0; j < Earth.width; j++)
             {
-                Organism organism = Earth.getInstance().getOrganismAt(i, j);
-                if (organism instanceof Carnivore && !((Carnivore) organism).isActive) organism.activate();
-            }
-        }
-    }
-
-    /**
-     * Method to activate all herbivores
-     */
-    private static void activateHerbivores()
-    {
-        for (int i = 0; i < Earth.height; i++)
-        {
-            for (int j = 0; j < Earth.width; j++)
-            {
-                Organism organism = Earth.getInstance().getOrganismAt(i, j);
-                if (organism instanceof Herbivore && !((Herbivore) organism).isActive) organism.activate();
+                Entity entity = Earth.getInstance().getEntityAt(i, j);
+                switch(entityType)
+                {
+                    case HERBIVORE:
+                        if (entity instanceof Herbivore && !((Herbivore) entity).isActive) ((Herbivore) entity).activate();
+                        break;
+                    case CARNIVORE:
+                        if (entity instanceof Carnivore && !((Carnivore) entity).isActive) ((Carnivore) entity).activate();
+                        break;
+                    case PLANT:
+                        if (entity instanceof Plant ) ((Plant) entity).activate();
+                        break;
+                }
             }
         }
     }
@@ -207,26 +206,16 @@ public class Earth implements Serializable
     /**
      * Method to randomly grow and kill plants as needed
      */
-    private static void activatePlants()
+    private static void growPlants()
     {
-        Earth earth = Earth.getInstance();
 
-        for (int i = 0; i < Earth.height; i++)
-        {
-            for (int j = 0; j < Earth.width; j++)
-            {
-                Organism organism = earth.getOrganismAt(i, j);
-                if (organism instanceof Plant) organism.activate();
-            }
-        }
-
-        ArrayList<int[]> freeLocations = earth.getFreeLocations();
+        ArrayList<int[]> freeLocations = Earth.getInstance().getFreeLocations();
         if ( freeLocations.isEmpty() ) return; //no plants can grow at this iteration
         int index = randomNumbers.nextInt( freeLocations.size() ); //pick a random index in the freeLocations array
         int x = freeLocations.get(index)[0];
         int y = freeLocations.get(index)[1];
 
-        earth.set(x, y, new Plant(x, y));
+        Earth.getInstance().set(x, y, new Plant(x, y));
     }
 
     /**
@@ -236,50 +225,41 @@ public class Earth implements Serializable
     {
             if (iteration % carnivoreIter == 0)
             {
-                activateCarnivores();
+                activateOrganism(EntityType.CARNIVORE);
                 carnivoreIter = minCarnivoreIter + randomNumbers.nextInt(maxCarnivoreIter - minCarnivoreIter + 1);
             }
             if (iteration % herbivoreIter == 0)
             {
-                activateHerbivores();
+                activateOrganism(EntityType.HERBIVORE);
                 herbivoreIter = minHerbivoreIter + randomNumbers.nextInt(maxHerbivoreIter - minHerbivoreIter + 1);
             }
             if (iteration % plantIter == 0)
             {
-                activatePlants();
+                activateOrganism(EntityType.PLANT);
+                growPlants();
                 plantIter = minPlantIter + randomNumbers.nextInt(maxPlantIter - minPlantIter + 1);
             }
 
-            ageAnimals();
-            deactivateAnimals();
+            ageAndDeactivateAnimals();
     }
 
     /**
      * Increase all the ages of animals by 1
+     * also deactivate animals and prepare for next iteration
      */
-    private static void ageAnimals()
+    private static void ageAndDeactivateAnimals()
     {
         for (int i = 0; i < Earth.height; i++)
         {
             for (int j = 0; j < Earth.width; j++)
             {
-                Organism organism = Earth.getInstance().getOrganismAt(i, j);
-                if (organism != null) organism.increaseAge();
-            }
-        }
-    }
-
-    /**
-     * Reset the isActive Variables of the Animals to prepare for next Iteration
-     */
-    private static void deactivateAnimals()
-    {
-        for (int i = 0; i < Earth.height; i++)
-        {
-            for (int j = 0; j < Earth.width; j++)
-            {
-                Organism organism = Earth.getInstance().getOrganismAt(i, j);
-                if (organism instanceof Animal) ((Animal) organism).deactivate();
+                Entity entity = Earth.getInstance().getEntityAt(i, j);
+                if (entity instanceof Plant) ((Plant) entity).grow();
+                else if (entity instanceof Animal)
+                {
+                    ((Animal) entity).increaseAge();
+                    ((Animal) entity).deactivate();
+                }
             }
         }
     }
@@ -294,20 +274,20 @@ public class Earth implements Serializable
 
         for(int m = 0; m < height; m++)
             for(int n = 0; n < width; n++)
-                if (getOrganismAt(m, n) == null) freeLocations.add(new int[]{m, n});
+                if (getEntityAt(m, n) == null) freeLocations.add(new int[]{m, n});
 
         return freeLocations;
     }
 
     /**
-     * Returns a list of Locations around organism
-     * @param organism the organism
+     * Returns a list of Locations around entity
+     * @param entity the entity
      * @return list of 2 element integer arrays
      */
-    public ArrayList<int[]> getLocationsAround(Organism organism)
+    public ArrayList<int[]> getLocationsAround(Entity entity)
     {
-        int x = organism.getX();
-        int y = organism.getY();
+        int x = entity.getX();
+        int y = entity.getY();
         ArrayList<int[]> locations = new ArrayList<>();
 
         int topX = x - 1, topY = y;
@@ -330,12 +310,12 @@ public class Earth implements Serializable
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        for (Organism[] row : grid)
+        for (Entity[] row : grid)
         {
-            for (Organism organism : row)
+            for (Entity entity : row)
             {
-                if (organism == null) sb.append("." + " ");
-                else sb.append(organism.toString() + " ");
+                if (entity == null) sb.append("." + " ");
+                else sb.append(entity.toString() + " ");
             }
             sb.append("\n");
         }

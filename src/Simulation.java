@@ -6,10 +6,7 @@
  * @version 2.0 3/31/2017
  */
 
-import jdk.nashorn.internal.scripts.JO;
-
 import javax.swing.*;
-import java.util.Scanner;
 
 public class Simulation
 {

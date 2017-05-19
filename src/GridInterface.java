@@ -78,36 +78,36 @@ public class GridInterface extends JFrame {
         for (int i = 0; i < Earth.width; i++) {
             for (int j = 0; j < Earth.height; j++) {
 
-                Organism organismAt = Organism.earth.getOrganismAt(i, j);
+                Entity entity = Organism.earth.getEntityAt(i, j);
 
                 //TODO: Create GUI that shows data of object (Energy and Age)
-                if (organismAt instanceof Herbivore) {
+                if (entity instanceof Herbivore) {
                     buttons[i] = new JButton((icons[0]));
                     frame.add(buttons[i]);
 
                     buttons[i].addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            JOptionPane.showMessageDialog(null, "Energy: " + ((Herbivore) organismAt).energy + "\n"
-                                    + "Age: " + organismAt.age + "\n" + "Fed: " + ((Herbivore) organismAt).feedCount + " times \n\n" );
+                            JOptionPane.showMessageDialog(null, "Energy: " + ((Herbivore) entity).energy + "\n"
+                                    + "Age: " + ((Herbivore) entity).age + "\n" + "Fed: " + ((Herbivore) entity).feedCount + " times \n\n" );
                         }
                     });
                 }
 
-                else if (organismAt instanceof Carnivore) {
+                else if (entity instanceof Carnivore) {
                     buttons[i] = new JButton((icons[1]));
                     frame.add(buttons[i]);
 
                     buttons[i].addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            JOptionPane.showMessageDialog(null, "Energy: " + ((Carnivore) organismAt).energy + "\n"
-                                    + "Age: " + organismAt.age + "\n" + "Fed: " + ((Carnivore) organismAt).feedCount + " times \n\n" );
+                            JOptionPane.showMessageDialog(null, "Energy: " + ((Carnivore) entity).energy + "\n"
+                                    + "Age: " + ((Carnivore) entity).age + "\n" + "Fed: " + ((Carnivore) entity).feedCount + " times \n\n" );
                         }
                     });
                 }
 
-                else if (organismAt instanceof Plant) {
+                else if (entity instanceof Plant) {
                     buttons[i] = new JButton((icons[2]));
                     frame.add(buttons[i]);
 
@@ -115,12 +115,12 @@ public class GridInterface extends JFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             JOptionPane.showMessageDialog(null, "Energy: N/A \n"
-                                    + "Age: " + organismAt.age + "\n\n");
+                                    + "Age: " + ((Plant) entity).age + "\n\n");
                         }
                     });
                 }
 
-                else if (organismAt == null) {
+                else if (entity == null) {
                     buttons[i] = new JButton((icons[3]));
                     frame.add(buttons[i]);
 

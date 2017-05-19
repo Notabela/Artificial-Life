@@ -18,28 +18,28 @@ public class Herbivore extends Animal
 
     /**
      * Method to check if organism is this animal's prey
-     * @param organism refers to the organism to checked for
+     * @param entity refers to the organism to checked for
      * @return true if organism is this animal's prey
      */
     @Override
-    public boolean isPrey(Organism organism)
+    public boolean isPrey(Entity entity)
     {
-        return (organism instanceof Plant);
+        return (entity instanceof Plant);
     }
 
     /**
      * Method to cause animal to try to feed on an organism
-     * @param organism refers to the organism that animal should try to feed on
+     * @param entity refers to the organism that animal should try to feed on
      * @return true if animal successfully fed on the organism
      */
     @Override
-    public boolean feedOn(Organism organism)
+    public boolean feedOn(Entity entity)
     {
-        if (organism instanceof Plant && energy < maxEnergy)
+        if (entity instanceof Plant && energy < maxEnergy)
         {
-           energy += energyGainPerFeed;
-           int newX = organism.getX(), newY = organism.getY();
-           organism.die();
+           energy += ((Plant) entity).energy;
+           int newX = entity.getX(), newY = entity.getY();
+            ((Plant) entity).die();
            feedCount++;
            moveTo(newX, newY);
            return true;
@@ -55,7 +55,7 @@ public class Herbivore extends Animal
     @Override
     public void giveBirthAt(int x, int y)
     {
-        if ( earth.getOrganismAt(x,y) != null ) return;
+        if ( earth.getEntityAt(x,y) != null ) return;
         energy -= initialEnergy;
         earth.set(x, y, new Herbivore(x,y));
     }
