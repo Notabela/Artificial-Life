@@ -5,41 +5,43 @@ import java.security.SecureRandom;
  * Organism.java
  * Purpose: defines abstract Organism class which represents any living object on the earth
  *
- * @author Daniel Obeng
- * @version 1.0 3/31/2017
+ * @author Daniel Obeng & Socratis Katehis
+ * @version 3.0 4/18/2017
  */
 public abstract class Organism extends Entity implements Serializable
 {
-    //constants for animal implementation purposes
-    //these constants are made available here to make changing how an animal behaves quick and easy
+    private static final SecureRandom rand = new SecureRandom(); //random variable
+    protected static final Earth earth = Earth.getInstance();    //earth reference
 
-    private static SecureRandom randomNumbers = new SecureRandom();
-    protected static final int lifeExpectancy = 50 + randomNumbers.nextInt(100 - 50 + 1);
+    //Tuning parameters for Organism Class
+    protected static final int LIFE_EXPECTANCY = 50 + rand.nextInt(100 - 50 + 1);
+    protected static final int INITIAL_ENERGY = 3;   // initial energy of animal
 
-    protected static Earth earth = Earth.getInstance();
-    protected double energy = 3;  //each organism has an energy level - energy of plants increase with age
+    //Member variables
+    protected double energy = INITIAL_ENERGY;
     protected int age = 0;
 
-    protected Organism(int x, int y)
-    {
-        super(x, y);
-    }
-
     /**
-     * Method to check if organism has reached its life Expectancy
-     * @return true if age of organism >= lifeExpectancy
+     * constructor of organism
+     * @param x x-location of obstacle on earth
+     * @param y y-location of obstacle on earth
      */
-    public boolean shouldDie() { return age >= lifeExpectancy; }
+    protected Organism(int x, int y) { super(x, y); }
 
     /**
-     * Method to kill an organism, removes organisms reference in earth grid
-     * and points it to a free space
+     * Checks if organism has reached its life Expectancy
+     * @return true if age of organism >= LIFE_EXPECTANCY
+     */
+    public boolean shouldDie() { return age >= LIFE_EXPECTANCY; }
+
+    /**
+     * Kills the Organism, that is removes organism's reference from earth grid
      */
     public void die() { earth.set( getX(), getY(), null ); }
 
     /**
-     * Method to activate a specific Organism. Organism will age, feed, grow etc if it can.
+     * Causes the Organism to age, feed, grow etc. based on its properties
      */
-    public abstract void activate();
+    public abstract void beginAction();
 
 }

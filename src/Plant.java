@@ -2,7 +2,7 @@
  * Plant.java
  * Purpose: defines Plant class to represent Plants on the earth
  *
- * @author Daniel Obeng
+ * @author Daniel Obeng and Socratis Katehis
  * @version 1.0 3/31/2017
  */
 public class Plant extends Organism
@@ -10,10 +10,10 @@ public class Plant extends Organism
     public Plant(int x, int y) { super(x, y); }
 
     /**
-     *
+     * plants die if it meets the dying requirement
      */
     @Override
-    public void activate()
+    public void beginAction()
     {
         if (shouldDie() ) die();
     }
@@ -24,8 +24,8 @@ public class Plant extends Organism
     @Override
     public String toString() { return "*"; }
 
-    /*
-     *
+    /**
+     * Plant grows: age increases and its energy increases
      */
     public void grow()
     {

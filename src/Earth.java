@@ -1,59 +1,48 @@
-import java.io.*;
+import java.io.Serializable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Earth.java
  * Purpose: defines Earth on which Entities will sit (Designed as a singleton)
  *
- * @author Daniel Obeng
+ * @author Daniel Obeng & Socratis Katehis
  * @version 1.0 3/31/2017
  */
 public class Earth implements Serializable
 {
+    private static SecureRandom rand = new SecureRandom(); //random number generator
 
-    //these constants are made available here to make changing how the earth is quick and easy
-    private static final int minCarnivoreIter = 2;  // iterations after which carnivore moves
-    private static final int maxCarnivoreIter = 4;  // iterations after which carnivore moves
-    private static final int minHerbivoreIter = 1;  // iterations after which carnivore moves
-    private static final int maxHerbivoreIter = 3;  // iterations after which carnivore moves
-    private static final int minPlantIter  = 3;  // min iterations after which new plant grows
-    private static final int maxPlantIter  = 5;  // max iterations after which new plant grows
+    //Tuning parameters for Organism Class
+    private static final int MIN_CARN_ITER = 2;  //min iterations after which carnivore moves
+    private static final int MAX_CARN_ITER = 4;  //max iterations after which carnivore moves
+    private static final int MIN_HERB_ITER = 1;  //min iterations after which herbivore moves
+    private static final int MAX_HERB_ITER = 3;  //max iterations after which herbivore moves
+    private static final int MIN_PLNT_ITER = 3;  //min iterations after which new plant grows
+    private static final int MAX_PLNT_ITER = 5;  //max iterations after which new plant grows
 
-    private static SecureRandom randomNumbers = new SecureRandom(); //random number generator
-
-    private enum EntityType { CARNIVORE, HERBIVORE, PLANT, OBSTACLE, LAKE }
+    private enum EntityType { CARNIVORE, HERBIVORE, PLANT }
 
     //Iteration at which plant/herbivore/carnivore move
-    private static int plantIter = minPlantIter + randomNumbers.nextInt(maxPlantIter - minPlantIter + 1);
-    private static int herbivoreIter = minHerbivoreIter + randomNumbers.nextInt(maxHerbivoreIter - minHerbivoreIter + 1);
-    private static int carnivoreIter = minCarnivoreIter + randomNumbers.nextInt(maxCarnivoreIter - minCarnivoreIter + 1);
+    private static int plantIter = MIN_PLNT_ITER + rand.nextInt(MAX_PLNT_ITER - MIN_PLNT_ITER + 1);
+    private static int herbivoreIter = MIN_HERB_ITER + rand.nextInt(MAX_HERB_ITER - MIN_HERB_ITER + 1);
+    private static int carnivoreIter = MIN_CARN_ITER + rand.nextInt(MAX_CARN_ITER - MIN_CARN_ITER + 1);
 
-    private static int initPlants;       // initial number of plants on earth
-    private static int initHerbivore;    // initial number of herbivores on earth
-    private static int initCarnivore;   // initial number of carnivores on earth
-    private static int initObstacles;   // initial number of obstacles
-    private static int initLakes;       // initial number of lakes
-
-    public static int width = 20;     //globally available width of earth instance S- 20 as default for testing
-    public static int height = 20;   //height of earth instance with default value
+    public static int width  = 20; // Width of earth - default size is 20
+    public static int height = 20; // Height of earth - default size is 20
 
     private static Earth instance; //reference to the only instance of earth in program
 
-    SaveGame save = new SaveGame();
+    private SaveGame save = new SaveGame(); //save game object to enable saving of current state of simulation
     private Entity[][] grid;
-
-    /**
-     * Overwrite Earth instance width and height - can only be done when earth
-     * instance has never been called
-     */
-    public static void setSize(int width, int height)
-    {
-        if ( instance != null ) return;
-
-        Earth.width = width;
-        Earth.height = height;
-    }
 
     /**
      * Private constructor to enforce Singleton design
@@ -66,30 +55,7 @@ public class Earth implements Serializable
     private Earth(Earth other) { grid = other.grid; }
 
     /**
-     * Get organism at location x and y
-     * @param x x-location of organism
-     * @param y y-location of organism
-     * @return Organism at x,y
-     */
-    public Entity getEntityAt(int x, int y)
-    {
-        return grid[x][y];
-    }
-
-    /**
-     * Set location x,y on earth grid to entity
-     * @param x x-location
-     * @param y y-location
-     * @param entity entity to place at location x,y
-     */
-    public void set(int x, int y, Entity entity)
-    {
-        grid[x][y] = entity;
-    }
-
-    /**
-     * static method to get the single Earth instance
-     * setsize should be called before getting the instance of the earth
+     * Get the single Earth instance
      * @return the single earth object in the program
      */
     public static Earth getInstance()
@@ -99,88 +65,214 @@ public class Earth implements Serializable
     }
 
     /**
-     * Save game //TODO
+     * Gets entity at location (x, y)
+     * @param x x-cor of organism
+     * @param y y-cor of organism
+     * @return Organism at (x, y)
      */
-    public static void saveGameState()
+    public Entity getEntityAt(int x, int y) { return grid[x][y]; }
+
+    /**
+     * Set (x, y) on earth grid to entity
+     * @param x x-location
+     * @param y y-location
+     * @param entity entity to placed at (x, y)
+     */
+    public void set(int x, int y, Entity entity)
     {
-        getInstance().save.saveGameState();
+        grid[x][y] = entity;
     }
 
     /**
-     * Load game //TODO
+     * Overwrites Earth instance's width and height - can only be done when earth's instance is null
+     * @param width initial width of earth
+     * @param height initial height of earth
      */
-    public static void LoadGameState()
+    public static void setSize(int width, int height)
     {
-        getInstance().save.loadFromSave();
+        //trying to set earth size after earth instance has been created throws an exception
+        //this should never happen
+        if ( instance != null ) throw new SimulationError(SimulationError.ErrorType.SET_SIZE_ERROR);
+
+        Earth.width = width;
+        Earth.height = height;
     }
 
     /**
-     * static method to overwrite earth's single instance with another object
-     * @param earth Earth object to overwrite default object with
-     */
-    public static void overwriteInstance(Earth earth)
-    {
-        instance = new Earth(earth);
-    }
-
-    /**
-    *  Initialize earth and game states
+    *  Initializes earth and game states
     *  @param width width of the earth
     *  @param height height of the earth
     */
     public static void initialize(int width, int height)
     {
-        initPlants = width + width/2;
-        initHerbivore = width;
-        initCarnivore = width/2;
-        initObstacles = width/3;
+        setSize(width, height); //set earth's width and height;
+        instance = new Earth(); //create Earth instance
 
-        setSize(width, height);   //set earth's width and size
-
-        fillEarth(EntityType.CARNIVORE, initCarnivore);
-        fillEarth(EntityType.HERBIVORE, initHerbivore);
-        fillEarth(EntityType.PLANT, initPlants);
-        fillEarth(EntityType.OBSTACLE, initLakes);
+        //Note (width/2 + width/3 + width/2 + width + width + width/2) < width * height
+        //Ensure this is the case by choosing the minimum of width and height
+        //Minimum width/height should be 10 * 10
+        int scalingParam = Math.min(width, height);
+        createLake(scalingParam/2);  //earth contains one patch of lake
+        placeObstacles(scalingParam/2);
+        fillEarth(EntityType.CARNIVORE, scalingParam/2);
+        fillEarth(EntityType.HERBIVORE, scalingParam);
+        fillEarth(EntityType.PLANT, scalingParam + scalingParam/2);
     }
 
     /**
-     * Precondition: ensure amount <= earth.freelocations
-     * @param entityType
-     * @param amount
+     * Begin Earth simulation
+     * @param iteration the current iteration number
+     */
+    public static void simulate(int iteration)
+    {
+        if (iteration % carnivoreIter == 0)
+        {
+            startActionOf(EntityType.CARNIVORE);
+            carnivoreIter = MIN_CARN_ITER + rand.nextInt(MAX_CARN_ITER - MIN_CARN_ITER + 1);
+        }
+        if (iteration % herbivoreIter == 0)
+        {
+            startActionOf(EntityType.HERBIVORE);
+            herbivoreIter = MIN_HERB_ITER + rand.nextInt(MAX_HERB_ITER - MIN_HERB_ITER + 1);
+        }
+        if (iteration % plantIter == 0)
+        {
+            startActionOf(EntityType.PLANT);
+            growPlants();
+            plantIter = MIN_PLNT_ITER + rand.nextInt(MAX_PLNT_ITER - MIN_PLNT_ITER + 1);
+        }
+
+        ageAndStopOrganismActivity();
+    }
+
+    /**
+     * Fills earth with the amount of the specified entity Type
+     * Precondition: ensure amount <= free
+     * @param entityType type of Entity to fill earth with
+     * @param amount the amount of entities to place on earth
      */
     private static void fillEarth(EntityType entityType, int amount)
     {
+        //if freelocations < amount, this method gets stuck in an infinite loop
+        if (instance.getFreeLocations().size() < amount)
+            throw new SimulationError(SimulationError.ErrorType.NOT_ENOUGH_FREE_LOCATIONS);
+
         for(int i = 0; i < amount & i <= Earth.height*Earth.width; )
         {
-            int randX = randomNumbers.nextInt(Earth.height);
-            int randY = randomNumbers.nextInt(Earth.width);
+            int randX = rand.nextInt(Earth.height);
+            int randY = rand.nextInt(Earth.width);
 
             if(Earth.getInstance().getEntityAt(randX, randY) == null)
             {
                 switch (entityType)
                 {
-                    case CARNIVORE:
-                        Earth.getInstance().set(randX, randY, new Carnivore(randX, randY));
-                        break;
-                    case HERBIVORE:
-                        Earth.getInstance().set(randX, randY, new Herbivore(randX, randY));
-                        break;
-                    case PLANT:
-                        Earth.getInstance().set(randX, randY, new Plant(randX, randY));
-                        break;
-                    case LAKE:
-                        Earth.getInstance().set(randX, randY, new Lake(randX, randY));
-                        break;
-                    case OBSTACLE:
-                        Earth.getInstance().set(randX, randY, new Obstacle(randX, randY));
-                        break;
+                    case CARNIVORE: Earth.getInstance().set(randX, randY, new Carnivore(randX, randY)); break;
+                    case HERBIVORE: Earth.getInstance().set(randX, randY, new Herbivore(randX, randY)); break;
+                    case PLANT:     Earth.getInstance().set(randX, randY, new Plant(randX, randY)); break;
                 }
                 i++;
             }
         }
     }
 
-    private static void activateOrganism(EntityType entityType)
+    /**
+     * Create a patch of lake objects on the earth
+     * lake will be made up of amount tiles
+     * @param num the number of spaces that will make up the lake
+     */
+    private static void createLake(int num)
+    {
+        if (instance.getFreeLocations().size() < num)
+            throw new SimulationError(SimulationError.ErrorType.NOT_ENOUGH_FREE_LOCATIONS);
+
+        boolean getNewLocation = true;
+        int prevX = -1, prevY = -1;
+        for(int i = 0; i < num; i++)
+        {
+            int x, y;
+            if ( getNewLocation || prevX < 0)
+            {
+                do {
+                    x = rand.nextInt(Earth.height);
+                    y = rand.nextInt(Earth.width);
+                } while (instance.getEntityAt(x, y) != null);
+
+                instance.set(x, y, new Lake(x, y));
+                prevX = x; prevY = y;
+                getNewLocation = false;
+                continue;
+            }
+
+            //passes Herbivore as a dummy, we simply need the free locations around x and y
+            ArrayList<int[]> locations = instance.getFreeLocationsAround(prevX, prevY);
+            if (locations.size() == 0) //no free locations around x,y - get a new random location
+            {
+                i--;
+                getNewLocation = true;
+                continue;
+            }
+
+            Collections.shuffle(locations);
+            x = locations.get(0)[0]; y = locations.get(0)[1];
+            instance.set(x, y, new Lake(x, y));
+            prevX = x; prevY = y;
+        }
+
+    }
+
+    /**
+\    * Places obstacles on the earth. Groups obstacles with probability 3/5
+     * @param num the number of obstacles to place on the earth
+     */
+    private static void placeObstacles(int num)
+    {
+        if (instance.getFreeLocations().size() < num)
+            throw new SimulationError(SimulationError.ErrorType.NOT_ENOUGH_FREE_LOCATIONS);
+
+        int prevX = -1, prevY = -1;
+        boolean keepRandom = false;
+
+        for(int i = 0; i < num & i <= Earth.height*Earth.width; i++)
+        {
+            //we should pick a new location and start working there
+            int x, y;
+            if ( keepRandom || prevX < 0 || rand.nextInt(5) > 3 )
+            {
+                //since num < number of free spaces, we can keep randomizing until we get a free location
+                do {
+                    x = rand.nextInt(Earth.height);
+                    y = rand.nextInt(Earth.width);
+                } while( instance.getEntityAt(x, y) != null);
+
+                instance.set(x, y, new Obstacle(x, y));
+                prevX = x; prevY = y;
+                keepRandom = false;
+            }
+            else
+            {
+                ArrayList<int[]> locations = instance.getFreeLocationsAround(prevX, prevY);
+                //no free locations lets repeat this iteration and randomize
+                if (locations.size() == 0)
+                {
+                    i--;
+                    keepRandom = true;
+                    continue;
+                }
+
+                Collections.shuffle(locations);
+                x = locations.get(0)[0]; y = locations.get(0)[1];
+                instance.set(x, y, new Obstacle(x, y));
+                prevX = x; prevY = y;
+            }
+
+        }
+    }
+
+    /**
+     * Call entity to action - entity will perform its default action
+     * @param entityType the type of entity to activate
+     */
+    private static void startActionOf(EntityType entityType)
     {
         for (int i = 0; i < Earth.height; i++)
         {
@@ -190,13 +282,13 @@ public class Earth implements Serializable
                 switch(entityType)
                 {
                     case HERBIVORE:
-                        if (entity instanceof Herbivore && !((Herbivore) entity).isActive) ((Herbivore) entity).activate();
+                        if (entity instanceof Herbivore && !((Herbivore) entity).isActive) ((Herbivore) entity).beginAction();
                         break;
                     case CARNIVORE:
-                        if (entity instanceof Carnivore && !((Carnivore) entity).isActive) ((Carnivore) entity).activate();
+                        if (entity instanceof Carnivore && !((Carnivore) entity).isActive) ((Carnivore) entity).beginAction();
                         break;
                     case PLANT:
-                        if (entity instanceof Plant ) ((Plant) entity).activate();
+                        if (entity instanceof Plant ) ((Plant) entity).beginAction();
                         break;
                 }
             }
@@ -204,14 +296,14 @@ public class Earth implements Serializable
     }
 
     /**
-     * Method to randomly grow and kill plants as needed
+     * Grow new plants and kill plants as needed
      */
     private static void growPlants()
     {
 
         ArrayList<int[]> freeLocations = Earth.getInstance().getFreeLocations();
         if ( freeLocations.isEmpty() ) return; //no plants can grow at this iteration
-        int index = randomNumbers.nextInt( freeLocations.size() ); //pick a random index in the freeLocations array
+        int index = rand.nextInt( freeLocations.size() ); //pick a random index in the freeLocations array
         int x = freeLocations.get(index)[0];
         int y = freeLocations.get(index)[1];
 
@@ -219,35 +311,10 @@ public class Earth implements Serializable
     }
 
     /**
-     * Method to start the Earth Simulation
-     */
-    public static void simulate(int iteration)
-    {
-            if (iteration % carnivoreIter == 0)
-            {
-                activateOrganism(EntityType.CARNIVORE);
-                carnivoreIter = minCarnivoreIter + randomNumbers.nextInt(maxCarnivoreIter - minCarnivoreIter + 1);
-            }
-            if (iteration % herbivoreIter == 0)
-            {
-                activateOrganism(EntityType.HERBIVORE);
-                herbivoreIter = minHerbivoreIter + randomNumbers.nextInt(maxHerbivoreIter - minHerbivoreIter + 1);
-            }
-            if (iteration % plantIter == 0)
-            {
-                activateOrganism(EntityType.PLANT);
-                growPlants();
-                plantIter = minPlantIter + randomNumbers.nextInt(maxPlantIter - minPlantIter + 1);
-            }
-
-            ageAndDeactivateAnimals();
-    }
-
-    /**
      * Increase all the ages of animals by 1
-     * also deactivate animals and prepare for next iteration
+     * also stop animal's activity and prepare for next iteration
      */
-    private static void ageAndDeactivateAnimals()
+    private static void ageAndStopOrganismActivity()
     {
         for (int i = 0; i < Earth.height; i++)
         {
@@ -258,14 +325,14 @@ public class Earth implements Serializable
                 else if (entity instanceof Animal)
                 {
                     ((Animal) entity).increaseAge();
-                    ((Animal) entity).deactivate();
+                    ((Animal) entity).endAction();
                 }
             }
         }
     }
 
     /**
-     * Returns a list of all free spaces available on earth
+     * Get list of all free spaces available on earth
      * @return list of 2 element integer arrays
      */
     public ArrayList<int[]> getFreeLocations()
@@ -277,6 +344,29 @@ public class Earth implements Serializable
                 if (getEntityAt(m, n) == null) freeLocations.add(new int[]{m, n});
 
         return freeLocations;
+    }
+
+    /**
+     * Returns a list of all free Locations around entity
+     * @param x x-cor
+     * @param y y-cor
+     * @return list of 2 element integer arrays
+     */
+    public ArrayList<int[]> getFreeLocationsAround(int x, int y)
+    {
+        ArrayList<int[]> locations = new ArrayList<>();
+
+        int topX = x - 1, topY = y;
+        int leftX = x, leftY = y - 1;
+        int rightX = x, rightY = y + 1;
+        int bottomX = x + 1, bottomY = y;
+
+        if (topX >= 0 && instance.getEntityAt(topX, topY) == null)  locations.add(new int[]{topX, topY});
+        if (leftY >= 0 && instance.getEntityAt(leftX, leftY) == null) locations.add(new int[]{leftX, leftY});
+        if (rightY < width && instance.getEntityAt(rightX, rightY) == null) locations.add(new int[]{rightX, rightY});
+        if (bottomX < height && instance.getEntityAt(bottomX, bottomY) == null) locations.add(new int[]{bottomX, bottomY});
+
+        return locations;
     }
 
     /**
@@ -304,7 +394,7 @@ public class Earth implements Serializable
     }
 
     /**
-     * Method to print the current state of the earth instance
+     * String representation of the earth
      */
     @Override
     public String toString()
@@ -323,6 +413,34 @@ public class Earth implements Serializable
         return sb.toString();
     }
 
+    /**
+     * Saves current game State to a binary file
+     */
+    public static void saveGameState()
+    {
+        getInstance().save.saveGameState();
+    }
+
+    /**
+     * Reads current game State from a saved binary file
+     */
+    public static void LoadGameState()
+    {
+        getInstance().save.loadFromSave();
+    }
+
+    /**
+     * static method to overwrite earth's single instance with another object
+     * @param earth Earth object to overwrite default object with
+     */
+    public static void overwriteInstance(Earth earth)
+    {
+        instance = new Earth(earth);
+    }
+
+    /**
+     * inner SaveGame class to enable saving earth's instance and necessary static variables for loading later
+     */
     class SaveGame implements Serializable
     {
         private String fileName;
@@ -339,9 +457,6 @@ public class Earth implements Serializable
             try (FileInputStream fstream = new FileInputStream(file)) {
                 ObjectInputStream istream = new ObjectInputStream(fstream);
 
-                initPlants = istream.readInt();
-                initHerbivore = istream.readInt();
-                initCarnivore = istream.readInt();
                 plantIter = istream.readInt();
                 carnivoreIter = istream.readInt();
                 herbivoreIter = istream.readInt();
@@ -374,9 +489,6 @@ public class Earth implements Serializable
                ObjectOutputStream ostream = new ObjectOutputStream(fstream);
 
                //Write Constants
-                ostream.writeInt(initPlants);
-                ostream.writeInt(initHerbivore);
-                ostream.writeInt(initCarnivore);
                 ostream.writeInt(plantIter);
                 ostream.writeInt(carnivoreIter);
                 ostream.writeInt(herbivoreIter);

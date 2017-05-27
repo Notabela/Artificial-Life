@@ -2,24 +2,29 @@
  * Herbivore.java
  * Purpose: defines Herbivore class
  *
- * @author Daniel Obeng
+ * @author Daniel Obeng & Socratis Katehis
  * @version 1.0 3/31/2017
  */
 public class Herbivore extends Animal
 {
 
+    /**
+     * Herbivore Constructor
+     * @param x x-cor of herbivore
+     * @param y y-cor of herbivore
+     */
     public Herbivore(int x, int y) { super(x, y); }
 
     /**
-     * @return string representation of Plant '*'
+     * @return string representation of Herbivore '&'
      */
     @Override
     public String toString() { return "&"; }
 
     /**
-     * Method to check if organism is this animal's prey
-     * @param entity refers to the organism to checked for
-     * @return true if organism is this animal's prey
+     * checks if entity is this animal's prey
+     * @param entity the entity to check for
+     * @return true if entity is this animal's prey
      */
     @Override
     public boolean isPrey(Entity entity)
@@ -28,35 +33,36 @@ public class Herbivore extends Animal
     }
 
     /**
-     * Method to cause animal to try to feed on an organism
-     * @param entity refers to the organism that animal should try to feed on
+     * Herbivore attempts to feed on prey
+     * @param entity the organism that animal should try to feed on
      * @return true if animal successfully fed on the organism
      */
     @Override
     public boolean feedOn(Entity entity)
     {
-        if (entity instanceof Plant && energy < maxEnergy)
+        if (entity instanceof Plant && energy < MAX_ENERGY)
         {
            energy += ((Plant) entity).energy;
            int newX = entity.getX(), newY = entity.getY();
-            ((Plant) entity).die();
+           ((Plant) entity).die();
            feedCount++;
            moveTo(newX, newY);
            return true;
         }
+
         return false;
     }
 
     /**
-     * Method to make herbivore give birth at x,y
-     * @param x represents x location for new child to live at
-     * @param y represents y location for new child to live at
+     * herbivore gives birth at (x, y)
+     * @param x x-cor of child
+     * @param y y-cor of child
      */
     @Override
     public void giveBirthAt(int x, int y)
     {
         if ( earth.getEntityAt(x,y) != null ) return;
-        energy -= initialEnergy;
+        energy -= INITIAL_ENERGY;
         earth.set(x, y, new Herbivore(x,y));
     }
 }

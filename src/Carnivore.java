@@ -1,12 +1,17 @@
 /**
  * Carnivore.java
- * Purpose: defines Carnivore class
+ * Purpose: Defines Carnivore class
  *
- * @author Daniel Obeng
- * @version 1.0 3/31/2017
+ * @author Daniel Obeng & Socratis Katehis
+ * @version 3.0 3/31/2017
  */
 public class Carnivore extends Animal
 {
+    /**
+     * Constructor of Carnivore
+     * @param x x-location of obstacle on earth
+     * @param y y-location of obstacle on earth
+     */
     public Carnivore(int x, int y) { super(x, y); }
 
     /**
@@ -16,9 +21,9 @@ public class Carnivore extends Animal
     public String toString() { return "@"; }
 
     /**
-     * Method to check if organism is this animal's prey
-     * @param entity refers to the organism to checked for
-     * @return true if organism is this animal's prey
+     * Checks if entity is this animal's prey
+     * @param entity the entity to be checked for
+     * @return true if entity is this animal's prey
      */
     @Override
     public boolean isPrey(Entity entity)
@@ -27,16 +32,16 @@ public class Carnivore extends Animal
     }
 
     /**
-     * Method to cause animal to try to feed on an organism
-     * @param entity refers to the organism that animal should try to feed on
+     * Carnivore attempts to feed on prey
+     * @param entity the organism that animal should try to feed on
      * @return true if animal successfully fed on the organism
      */
     @Override
     public boolean feedOn(Entity entity)
     {
-        if (entity instanceof Herbivore && energy < maxEnergy)
+        if (entity instanceof Herbivore && energy < MAX_ENERGY)
         {
-            energy += ((Herbivore) entity).energy;
+            energy += ((Herbivore) entity).energy; //animal obtains prey's energy
             int newX = entity.getX(), newY = entity.getY();
             ((Herbivore) entity).die();
             feedCount++;
@@ -47,15 +52,15 @@ public class Carnivore extends Animal
     }
 
     /**
-     * Abstract method to make Carnivore give birth at x,y
-     * @param x represents x location for new child to live at
-     * @param y represents y location for new child to live at
+     * Carnivore gives birth at (x, y)
+     * @param x x-cor of child
+     * @param y y-cor of child
      */
     @Override
     public void giveBirthAt(int x, int y)
     {
         if (earth.getEntityAt(x,y) != null) return;
-        energy -= initialEnergy;
+        energy -= INITIAL_ENERGY;
         earth.set( x, y, new Carnivore(x,y) );
     }
 }

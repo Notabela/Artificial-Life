@@ -25,7 +25,7 @@ public class GridInterface extends JFrame {
 
     JPanel grid = new JPanel();
     JPanel panel = new JPanel();
-    JButton[] buttons = new JButton[Earth.height *Earth.width];
+    JButton[] buttons = new JButton[Earth.height * Earth.width];
 
     public GridInterface()
     {
@@ -33,7 +33,8 @@ public class GridInterface extends JFrame {
         setSize(Earth.height*50,Earth.width*68);
     }
 
-    public void addComponents(final Container pane) {
+    public void addComponents(final Container pane)
+    {
 
         grid.setLayout(new GridLayout(Earth.width, Earth.height));
         panel.setLayout(new GridLayout(0,3));
