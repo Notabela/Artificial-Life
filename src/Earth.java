@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.Serializable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -413,6 +414,19 @@ public class Earth implements Serializable
         return sb.toString();
     }
 
+    public static void pauseGameState() {
+        try {
+            getInstance().wait();
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void continueGameState() {
+        getInstance().notify();
+    }
+
     /**
      * Saves current game State to a binary file
      */
@@ -424,9 +438,10 @@ public class Earth implements Serializable
     /**
      * Reads current game State from a saved binary file
      */
-    public static void LoadGameState()
+    public static boolean LoadGameState(File file)
     {
-        getInstance().save.loadFromSave();
+        getInstance().save.loadFromSave(file);
+        return getInstance().save.loadFromSave(file);
     }
 
     /**
@@ -452,9 +467,9 @@ public class Earth implements Serializable
             file = new File(fileName);
         }
 
-        public boolean loadFromSave()
+        public boolean loadFromSave(File loadFile)
         {
-            try (FileInputStream fstream = new FileInputStream(file)) {
+            try (FileInputStream fstream = new FileInputStream(loadFile)) {
                 ObjectInputStream istream = new ObjectInputStream(fstream);
 
                 plantIter = istream.readInt();
@@ -469,15 +484,22 @@ public class Earth implements Serializable
 
                 return true;
             } catch (FileNotFoundException e) {
-                System.out.println("Error: Unable to Load " + file.toString());
-                ///GUI.displayError("Error: " + file.toString() + " not found")
+                JOptionPane.showMessageDialog(null,
+                        "Unable to load " + loadFile.toString(),
+                        "No File Found",
+                        JOptionPane.ERROR_MESSAGE);
                 return false;
             } catch (IOException e) {
-                System.out.println("Error: unable to load " + file.toString());
-                ///GUI.displayError("Error: ");
+                JOptionPane.showMessageDialog(null,
+                        "Unable to load " + loadFile.toString(),
+                        "IO Exception",
+                        JOptionPane.ERROR_MESSAGE);
                 return false;
             } catch (ClassNotFoundException e) {
-                System.out.println("Error: Corrupt Save File");
+                JOptionPane.showMessageDialog(null,
+                        "Corrupt Save File",
+                        "File Error",
+                        JOptionPane.ERROR_MESSAGE);
                 throw( new RuntimeException()); //Game should Quit
             }
         }

@@ -10,34 +10,41 @@ import javax.swing.*;
 
 public class Simulation
 {
+
     public static void main(String[] args)
     {
+        IntroInterface intro = new IntroInterface();
+        intro.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        intro.setVisible(true);
+    }
 
-        //String firstText = JOptionPane.showInputDialog("Enter desired Earth width (>= 5)");
-        //String secondText = JOptionPane.showInputDialog("Enter desired Earth height (>= 5)");
-        //String thirdText = JOptionPane.showInputDialog("Enter number of iterations");
+     public static void newInitialization() {
+        String firstText = JOptionPane.showInputDialog("Enter desired Earth width (>= 5)");
+        String secondText = JOptionPane.showInputDialog("Enter desired Earth height (>= 5)");
 
-        //int userWidth = Integer.parseInt(firstText);
-        //int userHeight = Integer.parseInt(secondText);
-        //int maxIterations = Integer.parseInt(thirdText);
+        int userWidth = Integer.parseInt(firstText);
+        int userHeight = Integer.parseInt(secondText);
 
-        //int maxIterations = Integer.MAX_VALUE;
+        Earth.initialize(userWidth, userHeight);
 
-        Earth.initialize(20, 20);
-        //Earth.initialize(userWidth, userHeight);
-//        GridInterface frame = new GridInterface();
-//        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-//        frame.addComponents(frame.getContentPane());
-//        frame.setVisible(true);
+        beginSimulation();
+    }
+
+
+    public static void beginSimulation() {
+        GridInterface frame = new GridInterface();
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.addComponents(frame.getContentPane());
+        frame.setVisible(true);
 
         //Game ends when iterations = maxIterations
-        for(int iteration = 1; iteration <= 10/*maxIterations*/; iteration++)
+        int maxIterations = Integer.MAX_VALUE;
+        for(int iteration = 1; iteration <= maxIterations; iteration++)
         {
             Earth.simulate(iteration);
             System.out.println(Earth.getInstance());
 
-            //TODO: Call a function that refreshes GUI with latest instance
-            //frame.renew();
+            frame.renew();
             try
             {
                 Thread.sleep(1000);
