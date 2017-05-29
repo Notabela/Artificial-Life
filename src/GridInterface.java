@@ -34,6 +34,7 @@ public class GridInterface extends JFrame {
     public GridInterface()
     {
         super("Earth");
+        setSize(Earth.width*60,Earth.height*66);
     }
 
     public void addComponents(final Container pane)
