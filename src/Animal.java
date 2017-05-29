@@ -16,15 +16,15 @@ public abstract class Animal extends Organism implements Movable, Serializable
 
     //Tuning parameters for Organism Class
     private static final double ENERGY_LOST_PER_MOVE = 0.2; // energy animal loses per move
-    protected static final int MAX_ENERGY = 30 + rand.nextInt(60 - 30 + 1);  // energy at which animal can no longer feed
+    static final int MAX_ENERGY = 30 + rand.nextInt(60 - 30 + 1);  // energy at which animal can no longer feed
     private static final int CAN_BIRTH_ENERGY = 6 + rand.nextInt(10 - 6 + 1);   // energy at which animal can start giving birth
     private static final int LOW_CAN_BIRTH_AGE = 5 + rand.nextInt(10 - 5 + 1);  // lowest age at which animal can give birth
     private static final int HIGH_CAN_BIRTH_AGE = 50 + rand.nextInt(100 - 30 + 1);  // highest age at which animal can still give birth
 
     //helper bool to keep track of if animal was moved during the current iteration
     //This will ensure that organism isn't moved twice in the earth array at each iteration
-    public boolean isActive = false;
-    protected int feedCount = 0;  //amount of times animal has fed
+    boolean isActive = false;
+    int feedCount = 0;  //amount of times animal has fed
 
     /**
      * Constructor of Animal for subclasses
@@ -59,7 +59,7 @@ public abstract class Animal extends Organism implements Movable, Serializable
      * Checks if animal meets the minimum birth requirements
      * @return true if animal satisfies the minimum birth requirements
      */
-    public boolean canGiveBirth()
+    private boolean canGiveBirth()
     {
         return( (energy >= CAN_BIRTH_ENERGY) && (age >= LOW_CAN_BIRTH_AGE && age <= HIGH_CAN_BIRTH_AGE) );
     }
@@ -116,11 +116,9 @@ public abstract class Animal extends Organism implements Movable, Serializable
             ArrayList<int[]> adjacentLocations = earth.getLocationsAround(this);
             Collections.shuffle(adjacentLocations);
 
-            for(int i = 0, j = adjacentLocations.size(); i < j; i ++)
-            {
-                int x = adjacentLocations.get(i)[0], y = adjacentLocations.get(i)[1];
-                if(earth.getEntityAt(x, y) == null)
-                {
+            for (int[] adjacentLocation : adjacentLocations) {
+                int x = adjacentLocation[0], y = adjacentLocation[1];
+                if (earth.getEntityAt(x, y) == null) {
                     giveBirthAt(x, y);
                     break;
                 }
@@ -148,10 +146,10 @@ public abstract class Animal extends Organism implements Movable, Serializable
     /**
      * Increases animal's age by 1
      */
-    public void increaseAge() { age++; }
+    void increaseAge() { age++; }
 
     /**
      * Helper method: Resets animal's moved var. Check variable isActive's comment for more details
      */
-    public void endAction() { isActive = false; }
+    void endAction() { isActive = false; }
 }

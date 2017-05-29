@@ -10,15 +10,15 @@ import java.io.Serializable;
 public abstract class Entity implements Serializable
 {
     //Member Variables
-    protected int locationX;
-    protected int locationY;
+    int locationX;
+    int locationY;
 
     /**
      * Protected Constructor of Entity for subclasses
      * @param x x-location of entity
      * @param y y-location of entity
      */
-    protected Entity(int x, int y)
+    Entity(int x, int y)
     {
         locationX = x;
         locationY = y;

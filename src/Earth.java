@@ -37,8 +37,8 @@ public class Earth implements Serializable
     private static int herbivoreIter = MIN_HERB_ITER + rand.nextInt(MAX_HERB_ITER - MIN_HERB_ITER + 1);
     private static int carnivoreIter = MIN_CARN_ITER + rand.nextInt(MAX_CARN_ITER - MIN_CARN_ITER + 1);
 
-    public static int width  = 20; // Width of earth - default size is 20
-    public static int height = 20; // Height of earth - default size is 20
+    static int width  = 20; // Width of earth - default size is 20
+    static int height = 20; // Height of earth - default size is 20
 
     private static Earth instance; //reference to the only instance of earth in program
 
@@ -59,7 +59,7 @@ public class Earth implements Serializable
      * Get the single Earth instance
      * @return the single earth object in the program
      */
-    public static Earth getInstance()
+    static Earth getInstance()
     {
         if (instance == null) instance = new Earth();
         return instance;
@@ -71,7 +71,7 @@ public class Earth implements Serializable
      * @param y y-cor of organism
      * @return Organism at (x, y)
      */
-    public Entity getEntityAt(int x, int y) { return grid[x][y]; }
+    Entity getEntityAt(int x, int y) { return grid[x][y]; }
 
     /**
      * Set (x, y) on earth grid to entity
@@ -79,7 +79,7 @@ public class Earth implements Serializable
      * @param y y-location
      * @param entity entity to placed at (x, y)
      */
-    public void set(int x, int y, Entity entity)
+    void set(int x, int y, Entity entity)
     {
         grid[x][y] = entity;
     }
@@ -89,7 +89,7 @@ public class Earth implements Serializable
      * @param width initial width of earth
      * @param height initial height of earth
      */
-    public static void setSize(int width, int height)
+    private static void setSize(int width, int height)
     {
         //trying to set earth size after earth instance has been created throws an exception
         //this should never happen
@@ -104,7 +104,7 @@ public class Earth implements Serializable
     *  @param width width of the earth
     *  @param height height of the earth
     */
-    public static void initialize(int width, int height)
+    static void initialize(int width, int height)
     {
         setSize(width, height); //set earth's width and height;
         instance = new Earth(); //create Earth instance
@@ -124,7 +124,7 @@ public class Earth implements Serializable
      * Begin Earth simulation
      * @param iteration the current iteration number
      */
-    public static void simulate(int iteration)
+    static void simulate(int iteration)
     {
         if (iteration % carnivoreIter == 0)
         {
@@ -336,7 +336,7 @@ public class Earth implements Serializable
      * Get list of all free spaces available on earth
      * @return list of 2 element integer arrays
      */
-    public ArrayList<int[]> getFreeLocations()
+    private ArrayList<int[]> getFreeLocations()
     {
         ArrayList<int[]> freeLocations = new ArrayList<>();
 
@@ -353,19 +353,19 @@ public class Earth implements Serializable
      * @param y y-cor
      * @return list of 2 element integer arrays
      */
-    public ArrayList<int[]> getFreeLocationsAround(int x, int y)
+    private ArrayList<int[]> getFreeLocationsAround(int x, int y)
     {
         ArrayList<int[]> locations = new ArrayList<>();
 
-        int topX = x - 1, topY = y;
-        int leftX = x, leftY = y - 1;
-        int rightX = x, rightY = y + 1;
-        int bottomX = x + 1, bottomY = y;
+        int topX = x - 1;
+        int leftY = y - 1;
+        int rightY = y + 1;
+        int bottomX = x + 1;
 
-        if (topX >= 0 && instance.getEntityAt(topX, topY) == null)  locations.add(new int[]{topX, topY});
-        if (leftY >= 0 && instance.getEntityAt(leftX, leftY) == null) locations.add(new int[]{leftX, leftY});
-        if (rightY < width && instance.getEntityAt(rightX, rightY) == null) locations.add(new int[]{rightX, rightY});
-        if (bottomX < height && instance.getEntityAt(bottomX, bottomY) == null) locations.add(new int[]{bottomX, bottomY});
+        if (topX >= 0 && instance.getEntityAt(topX, y) == null)  locations.add(new int[]{topX, y});
+        if (leftY >= 0 && instance.getEntityAt(x, leftY) == null) locations.add(new int[]{x, leftY});
+        if (rightY < width && instance.getEntityAt(x, rightY) == null) locations.add(new int[]{x, rightY});
+        if (bottomX < height && instance.getEntityAt(bottomX, y) == null) locations.add(new int[]{bottomX, y});
 
         return locations;
     }
@@ -375,21 +375,21 @@ public class Earth implements Serializable
      * @param entity the entity
      * @return list of 2 element integer arrays
      */
-    public ArrayList<int[]> getLocationsAround(Entity entity)
+    ArrayList<int[]> getLocationsAround(Entity entity)
     {
         int x = entity.getX();
         int y = entity.getY();
         ArrayList<int[]> locations = new ArrayList<>();
 
-        int topX = x - 1, topY = y;
-        int leftX = x, leftY = y - 1;
-        int rightX = x, rightY = y + 1;
-        int bottomX = x + 1, bottomY = y;
+        int topX = x - 1;
+        int leftY = y - 1;
+        int rightY = y + 1;
+        int bottomX = x + 1;
 
-        if (topX >= 0)  locations.add(new int[]{topX, topY});
-        if (leftY >= 0) locations.add(new int[]{leftX, leftY});
-        if (rightY < width) locations.add(new int[]{rightX, rightY});
-        if (bottomX < height) locations.add(new int[]{bottomX, bottomY});
+        if (topX >= 0)  locations.add(new int[]{topX, y});
+        if (leftY >= 0) locations.add(new int[]{x, leftY});
+        if (rightY < width) locations.add(new int[]{x, rightY});
+        if (bottomX < height) locations.add(new int[]{bottomX, y});
 
         return locations;
     }
@@ -406,7 +406,7 @@ public class Earth implements Serializable
             for (Entity entity : row)
             {
                 if (entity == null) sb.append("." + " ");
-                else sb.append(entity.toString() + " ");
+                else sb.append(entity.toString()).append(" ");
             }
             sb.append("\n");
         }
@@ -414,7 +414,7 @@ public class Earth implements Serializable
         return sb.toString();
     }
 
-    public static void pauseGameState() {
+    static void pauseGameState() {
         try {
             getInstance().wait();
         }
@@ -423,14 +423,14 @@ public class Earth implements Serializable
         }
     }
 
-    public static void continueGameState() {
+    static void continueGameState() {
         getInstance().notify();
     }
 
     /**
      * Saves current game State to a binary file
      */
-    public static void saveGameState()
+    static void saveGameState()
     {
         getInstance().save.saveGameState();
     }
@@ -438,7 +438,7 @@ public class Earth implements Serializable
     /**
      * Reads current game State from a saved binary file
      */
-    public static boolean LoadGameState(File file)
+    static boolean LoadGameState(File file)
     {
         getInstance().save.loadFromSave(file);
         return getInstance().save.loadFromSave(file);
@@ -448,7 +448,7 @@ public class Earth implements Serializable
      * static method to overwrite earth's single instance with another object
      * @param earth Earth object to overwrite default object with
      */
-    public static void overwriteInstance(Earth earth)
+    private static void overwriteInstance(Earth earth)
     {
         instance = new Earth(earth);
     }
@@ -461,13 +461,13 @@ public class Earth implements Serializable
         private String fileName;
         private File file;
 
-        public SaveGame()
+        SaveGame()
         {
             fileName = "save.bin";
             file = new File(fileName);
         }
 
-        public boolean loadFromSave(File loadFile)
+        boolean loadFromSave(File loadFile)
         {
             try (FileInputStream fstream = new FileInputStream(loadFile)) {
                 ObjectInputStream istream = new ObjectInputStream(fstream);
@@ -504,7 +504,7 @@ public class Earth implements Serializable
             }
         }
 
-        public boolean saveGameState()
+        boolean saveGameState()
         {
             try ( FileOutputStream fstream = new FileOutputStream(file))
             {
@@ -528,7 +528,6 @@ public class Earth implements Serializable
                 return false;
             } catch (IOException e)
             {
-                System.out.println(e);
                 System.out.println("Error: unable to save to" + file.toString());
                 ///GUI.displayError("Error: ");
                 return false;

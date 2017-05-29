@@ -25,7 +25,7 @@ public class SimulationError extends RuntimeException
      * SimulationError constructor
      * @param error the Error type of the error encountered
      */
-    public SimulationError(ErrorType error)
+    SimulationError(ErrorType error)
     {
         super(error.description);
     }
