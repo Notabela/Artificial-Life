@@ -7,7 +7,7 @@ run Simulation.java
 The following **requirements** are completed:
 
 - [X] Use Interfaces
-- [ ] Use generic programming or generic Collection
+- [X] Use generic programming or generic Collection
 - [X] Use polymorphism
 - [X] Use inheritance where necessary
 - [X] Use encapsulation for all classes
@@ -17,7 +17,7 @@ The following **requirements** are completed:
 
 The following **optional** features are implemented:
 - [ ] Animals are intelligent (have memory)
-- [ ] Include more features into the Simulation such as water, obstacles, different plants, etc.
+- [X] Include more features into the Simulation such as water, obstacles, different plants, etc.
 - [ ] GUI displays skull before Animal dies
 - [X] User can save/load game state
 
