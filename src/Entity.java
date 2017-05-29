@@ -18,10 +18,10 @@ public abstract class Entity implements Serializable
      * @param x x-location of entity
      * @param y y-location of entity
      */
-    Entity(int x, int y)
+    Entity(Pair<Integer,Integer> pair)
     {
-        locationX = x;
-        locationY = y;
+        locationX = pair.getXCoord();
+        locationY = pair.getYCoord();
     }
 
     /**

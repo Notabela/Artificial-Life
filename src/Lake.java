@@ -14,7 +14,7 @@ public class Lake extends Entity implements Serializable
      * @param x x-location of lake on earth
      * @param y y-location of lake on earth
      */
-    Lake(int x, int y) { super(x, y); }
+    Lake(Pair<Integer,Integer> pair) { super(pair); }
 
     /**
      * override object toString method

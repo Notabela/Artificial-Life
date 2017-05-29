@@ -31,7 +31,7 @@ public abstract class Animal extends Organism implements Movable, Serializable
      * @param x x-location of animal on earth
      * @param y y-location of animal on earth
      */
-    protected Animal(int x, int y) { super(x, y); }
+    protected Animal(Pair<Integer,Integer> pair) { super(pair); }
 
     /**
      * Animal feeds on given entity
@@ -53,7 +53,7 @@ public abstract class Animal extends Organism implements Movable, Serializable
      * @param x represents x location for new child to live at
      * @param y represents y location for new child to live at
      */
-    public abstract void giveBirthAt(int x, int y);
+    public abstract void giveBirthAt(Pair<Integer,Integer> pair);
 
     /**
      * Checks if animal meets the minimum birth requirements
@@ -103,7 +103,8 @@ public abstract class Animal extends Organism implements Movable, Serializable
                 Entity entity = earth.getEntityAt(location[0], location[1]);
                 if (entity == null)
                 {
-                    moveTo(location[0], location[1]);
+                    Pair<Integer,Integer> defaultPair = new Pair<>(location[0],location[1]);
+                    moveTo(defaultPair);
                     break;
                 } else if ( feedOn(entity) ) break;
             }
@@ -118,8 +119,9 @@ public abstract class Animal extends Organism implements Movable, Serializable
 
             for (int[] adjacentLocation : adjacentLocations) {
                 int x = adjacentLocation[0], y = adjacentLocation[1];
-                if (earth.getEntityAt(x, y) == null) {
-                    giveBirthAt(x, y);
+                Pair<Integer,Integer> pair = new Pair<>(x,y);
+                if (earth.getEntityAt(pair) == null) {
+                    giveBirthAt(pair);
                     break;
                 }
             }
@@ -130,17 +132,17 @@ public abstract class Animal extends Organism implements Movable, Serializable
 
     /**
      * Moves animal to (x, y)
-     * @param x  x-cor the animal should move to
-     * @param y  y-cor the animal should move to
+     * @param pair.getXCoord()  x-cor the animal should move to
+     * @param pair.getYCoord()  y-cor the animal should move to
      */
     @Override
-    public void moveTo(int x, int y)
+    public void moveTo(Pair<Integer,Integer> pair)
     {
         isActive = true;
         energy -= ENERGY_LOST_PER_MOVE;
         earth.set(getX(), getY(), null);
-        locationX = x; locationY = y;
-        earth.set(x, y,this);
+        locationX = pair.getXCoord(); locationY = pair.getYCoord();
+        earth.set(pair.getXCoord(), pair.getYCoord(),this);
     }
 
     /**

@@ -48,7 +48,6 @@ public class IntroInterface extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //Continue the game
-                Simulation.newInitialization();
             }
         });
 
@@ -75,7 +74,7 @@ public class IntroInterface extends JFrame {
                 File inputFile = fileChooser.getSelectedFile();
 
                 try {
-                    Earth.LoadGameState(inputFile);
+                    Earth.LoadGameState();
                     noError = true;
                 }
                 catch (NullPointerException noFile) {
@@ -85,7 +84,7 @@ public class IntroInterface extends JFrame {
                             JOptionPane.ERROR_MESSAGE);
                 }
 
-                if(noError && Earth.LoadGameState(inputFile)) {
+                if(noError && Earth.LoadGameState()) {
                     Simulation.beginSimulation();
                 }
             }

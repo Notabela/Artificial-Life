@@ -12,5 +12,5 @@ public interface Movable
      * @param x x-cor of new location
      * @param y y-cor of new location
      */
-    void moveTo(int x, int y);
+    void moveTo(Pair<Integer,Integer> pair);
 }

@@ -14,7 +14,7 @@ public class Obstacle extends Entity implements Serializable
      * @param x x-location of obstacle on earth
      * @param y y-location of obstacle on earth
      */
-    Obstacle(int x, int y) { super(x, y); }
+    Obstacle(Pair<Integer,Integer> pair) { super(pair); }
 
     /**
      * override object toString method

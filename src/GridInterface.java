@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 /**
  * Created by socra_000 on 5/12/2017.
@@ -33,7 +34,6 @@ public class GridInterface extends JFrame {
     public GridInterface()
     {
         super("Earth");
-        setSize(Earth.width*45,Earth.height*66);
     }
 
     public void addComponents(final Container pane)
@@ -70,6 +70,7 @@ public class GridInterface extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 //Save the game
                 Earth.saveGameState();
+                JOptionPane.showMessageDialog(null,"Game has been saved!");
             }
         });
 

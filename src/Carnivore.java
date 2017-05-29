@@ -12,7 +12,7 @@ public class Carnivore extends Animal
      * @param x x-location of obstacle on earth
      * @param y y-location of obstacle on earth
      */
-    public Carnivore(int x, int y) { super(x, y); }
+    public Carnivore(Pair<Integer,Integer> pair) { super(pair); }
 
     /**
      * @return string representation of Plant '*'
@@ -43,9 +43,10 @@ public class Carnivore extends Animal
         {
             energy += ((Herbivore) entity).energy; //animal obtains prey's energy
             int newX = entity.getX(), newY = entity.getY();
+            Pair<Integer,Integer> newPair = new Pair<Integer,Integer>(newX,newY);
             ((Herbivore) entity).die();
             feedCount++;
-            moveTo(newX, newY);
+            moveTo(newPair);
             return true;
         }
         return false;
@@ -57,10 +58,10 @@ public class Carnivore extends Animal
      * @param y y-cor of child
      */
     @Override
-    public void giveBirthAt(int x, int y)
+    public void giveBirthAt(Pair<Integer,Integer> pair)
     {
-        if (earth.getEntityAt(x,y) != null) return;
+        if (earth.getEntityAt(pair) != null) return;
         energy -= INITIAL_ENERGY;
-        earth.set( x, y, new Carnivore(x,y) );
+        earth.set( pair.getXCoord(), pair.getYCoord(), new Carnivore(pair) );
     }
 }

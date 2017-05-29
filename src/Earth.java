@@ -71,7 +71,8 @@ public class Earth implements Serializable
      * @param y y-cor of organism
      * @return Organism at (x, y)
      */
-    Entity getEntityAt(int x, int y) { return grid[x][y]; }
+    Entity getEntityAt(Pair<Integer,Integer> pair) { return grid[pair.getXCoord()][pair.getYCoord()]; }
+    Entity getEntityAt(int x, int y) {return grid[x][y];}
 
     /**
      * Set (x, y) on earth grid to entity
@@ -163,13 +164,15 @@ public class Earth implements Serializable
             int randX = rand.nextInt(Earth.height);
             int randY = rand.nextInt(Earth.width);
 
-            if(Earth.getInstance().getEntityAt(randX, randY) == null)
+            Pair<Integer,Integer> randPair = new Pair<Integer,Integer>(randX, randY);
+
+            if(Earth.getInstance().getEntityAt(randPair) == null)
             {
                 switch (entityType)
                 {
-                    case CARNIVORE: Earth.getInstance().set(randX, randY, new Carnivore(randX, randY)); break;
-                    case HERBIVORE: Earth.getInstance().set(randX, randY, new Herbivore(randX, randY)); break;
-                    case PLANT:     Earth.getInstance().set(randX, randY, new Plant(randX, randY)); break;
+                    case CARNIVORE: Earth.getInstance().set(randX, randY, new Carnivore(randPair)); break;
+                    case HERBIVORE: Earth.getInstance().set(randX, randY, new Herbivore(randPair)); break;
+                    case PLANT:     Earth.getInstance().set(randX, randY, new Plant(randPair)); break;
                 }
                 i++;
             }
@@ -196,9 +199,11 @@ public class Earth implements Serializable
                 do {
                     x = rand.nextInt(Earth.height);
                     y = rand.nextInt(Earth.width);
+
                 } while (instance.getEntityAt(x, y) != null);
 
-                instance.set(x, y, new Lake(x, y));
+                Pair<Integer,Integer> pair = new Pair<>(x,y);
+                instance.set(x, y, new Lake(pair));
                 prevX = x; prevY = y;
                 getNewLocation = false;
                 continue;
@@ -215,7 +220,8 @@ public class Earth implements Serializable
 
             Collections.shuffle(locations);
             x = locations.get(0)[0]; y = locations.get(0)[1];
-            instance.set(x, y, new Lake(x, y));
+            Pair<Integer,Integer> pair = new Pair<>(x,y);
+            instance.set(x, y, new Lake(pair));
             prevX = x; prevY = y;
         }
 
@@ -245,7 +251,8 @@ public class Earth implements Serializable
                     y = rand.nextInt(Earth.width);
                 } while( instance.getEntityAt(x, y) != null);
 
-                instance.set(x, y, new Obstacle(x, y));
+                Pair<Integer,Integer> pair = new Pair<>(x,y);
+                instance.set(x, y, new Obstacle(pair));
                 prevX = x; prevY = y;
                 keepRandom = false;
             }
@@ -262,7 +269,8 @@ public class Earth implements Serializable
 
                 Collections.shuffle(locations);
                 x = locations.get(0)[0]; y = locations.get(0)[1];
-                instance.set(x, y, new Obstacle(x, y));
+                Pair<Integer,Integer> pair = new Pair<>(x,y);
+                instance.set(x, y, new Obstacle(pair));
                 prevX = x; prevY = y;
             }
 
@@ -308,7 +316,9 @@ public class Earth implements Serializable
         int x = freeLocations.get(index)[0];
         int y = freeLocations.get(index)[1];
 
-        Earth.getInstance().set(x, y, new Plant(x, y));
+        Pair<Integer,Integer> pair = new Pair<>(x,y);
+
+        Earth.getInstance().set(x, y, new Plant(pair));
     }
 
     /**
@@ -416,7 +426,9 @@ public class Earth implements Serializable
 
     static void pauseGameState() {
         try {
-            getInstance().wait();
+            synchronized (getInstance()) {
+                getInstance().wait();
+            }
         }
         catch (InterruptedException e) {
             e.printStackTrace();
@@ -424,7 +436,9 @@ public class Earth implements Serializable
     }
 
     static void continueGameState() {
-        getInstance().notify();
+        synchronized (getInstance()) {
+            getInstance().notify();
+        }
     }
 
     /**
@@ -438,10 +452,10 @@ public class Earth implements Serializable
     /**
      * Reads current game State from a saved binary file
      */
-    static boolean LoadGameState(File file)
+    static boolean LoadGameState()
     {
-        getInstance().save.loadFromSave(file);
-        return getInstance().save.loadFromSave(file);
+        getInstance().save.loadFromSave();
+        return getInstance().save.loadFromSave();
     }
 
     /**
@@ -467,9 +481,9 @@ public class Earth implements Serializable
             file = new File(fileName);
         }
 
-        boolean loadFromSave(File loadFile)
+        boolean loadFromSave()
         {
-            try (FileInputStream fstream = new FileInputStream(loadFile)) {
+            try (FileInputStream fstream = new FileInputStream(file)) {
                 ObjectInputStream istream = new ObjectInputStream(fstream);
 
                 plantIter = istream.readInt();
@@ -485,13 +499,13 @@ public class Earth implements Serializable
                 return true;
             } catch (FileNotFoundException e) {
                 JOptionPane.showMessageDialog(null,
-                        "Unable to load " + loadFile.toString(),
+                        "Unable to load " + file.toString(),
                         "No File Found",
                         JOptionPane.ERROR_MESSAGE);
                 return false;
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(null,
-                        "Unable to load " + loadFile.toString(),
+                        "Unable to load " + file.toString(),
                         "IO Exception",
                         JOptionPane.ERROR_MESSAGE);
                 return false;

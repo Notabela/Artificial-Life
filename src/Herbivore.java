@@ -13,7 +13,7 @@ public class Herbivore extends Animal
      * @param x x-cor of herbivore
      * @param y y-cor of herbivore
      */
-    public Herbivore(int x, int y) { super(x, y); }
+    public Herbivore(Pair<Integer,Integer> pair) { super(pair); }
 
     /**
      * @return string representation of Herbivore '&'
@@ -44,9 +44,10 @@ public class Herbivore extends Animal
         {
            energy += ((Plant) entity).energy;
            int newX = entity.getX(), newY = entity.getY();
+           Pair<Integer,Integer> newPair = new Pair<>(newX,newY);
            ((Plant) entity).die();
            feedCount++;
-           moveTo(newX, newY);
+           moveTo(newPair);
            return true;
         }
 
@@ -59,10 +60,10 @@ public class Herbivore extends Animal
      * @param y y-cor of child
      */
     @Override
-    public void giveBirthAt(int x, int y)
+    public void giveBirthAt(Pair<Integer,Integer> pair)
     {
-        if ( earth.getEntityAt(x,y) != null ) return;
+        if ( earth.getEntityAt(pair) != null ) return;
         energy -= INITIAL_ENERGY;
-        earth.set(x, y, new Herbivore(x,y));
+        earth.set(pair.getXCoord(), pair.getYCoord(), new Herbivore(pair));
     }
 }

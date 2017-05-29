@@ -26,7 +26,7 @@ public abstract class Organism extends Entity implements Serializable
      * @param x x-location of obstacle on earth
      * @param y y-location of obstacle on earth
      */
-    protected Organism(int x, int y) { super(x, y); }
+    protected Organism(Pair<Integer,Integer> pair) { super(pair); }
 
     /**
      * Checks if organism has reached its life Expectancy

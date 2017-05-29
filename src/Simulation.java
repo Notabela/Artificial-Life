@@ -13,25 +13,44 @@ public class Simulation
 
     public static void main(String[] args)
     {
-        IntroInterface intro = new IntroInterface();
-        intro.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        intro.setVisible(true);
+        newInitialization();
     }
 
-     public static void newInitialization() {
-        String firstText = JOptionPane.showInputDialog("Enter desired Earth width (>= 5)");
-        String secondText = JOptionPane.showInputDialog("Enter desired Earth height (>= 5)");
+     private static void newInitialization() {
+         int dialogButton = JOptionPane.YES_NO_OPTION;
 
-        int userWidth = Integer.parseInt(firstText);
-        int userHeight = Integer.parseInt(secondText);
+         int dialogResult = JOptionPane.showConfirmDialog(null,
+                 "Would You Like to Load a Previous Save?","Artificial Life",dialogButton);
+         if(dialogResult == JOptionPane.YES_OPTION){
+             boolean noError = false;
+             try {
+                 Earth.LoadGameState();
+                 noError = true;
+             } catch (NullPointerException noFile) {
+                 JOptionPane.showMessageDialog(null,
+                         "No file was selected to load!",
+                         "File Error",
+                         JOptionPane.ERROR_MESSAGE);
+             }
+             if (noError && Earth.LoadGameState()) {
+                 Simulation.beginSimulation();
+             }
+         }
+         else {
+             String firstText = JOptionPane.showInputDialog("Enter desired Earth width (>= 5)");
+             String secondText = JOptionPane.showInputDialog("Enter desired Earth height (>= 5)");
 
-        Earth.initialize(userWidth, userHeight);
+             int userWidth = Integer.parseInt(firstText);
+             int userHeight = Integer.parseInt(secondText);
 
-        beginSimulation();
+             Earth.initialize(userWidth, userHeight);
+
+             beginSimulation();
+         }
     }
 
 
-    public static void beginSimulation() {
+    static void beginSimulation() {
         GridInterface frame = new GridInterface();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.addComponents(frame.getContentPane());
@@ -42,7 +61,6 @@ public class Simulation
         for(int iteration = 1; iteration <= maxIterations; iteration++)
         {
             Earth.simulate(iteration);
-            System.out.println(Earth.getInstance());
 
             frame.renew();
             try

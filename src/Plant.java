@@ -7,7 +7,7 @@
  */
 public class Plant extends Organism
 {
-    public Plant(int x, int y) { super(x, y); }
+    public Plant(Pair<Integer,Integer> pair) { super(pair); }
 
     /**
      * plants die if it meets the dying requirement
