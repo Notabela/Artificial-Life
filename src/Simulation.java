@@ -31,6 +31,11 @@ public class Simulation
                          "No file was selected to load!",
                          "File Error",
                          JOptionPane.ERROR_MESSAGE);
+             } catch (SimulationError error) {
+                 JOptionPane.showMessageDialog(null,
+                         error.toString(),
+                         "File Error",
+                         JOptionPane.ERROR_MESSAGE);
              }
              if (noError && Earth.LoadGameState()) {
                  Simulation.beginSimulation();

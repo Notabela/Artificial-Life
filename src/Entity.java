@@ -9,14 +9,12 @@ import java.io.Serializable;
  */
 public abstract class Entity implements Serializable
 {
-    //Member Variables
     int locationX;
     int locationY;
 
     /**
      * Protected Constructor of Entity for subclasses
-     * @param x x-location of entity
-     * @param y y-location of entity
+     * @param pair the (x, y) pair of coordinates
      */
     Entity(Pair<Integer,Integer> pair)
     {

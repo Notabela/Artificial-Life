@@ -28,8 +28,7 @@ public abstract class Animal extends Organism implements Movable, Serializable
 
     /**
      * Constructor of Animal for subclasses
-     * @param x x-location of animal on earth
-     * @param y y-location of animal on earth
+     * @param pair (x, y) pair of animal's coordinates
      */
     protected Animal(Pair<Integer,Integer> pair) { super(pair); }
 
@@ -50,8 +49,7 @@ public abstract class Animal extends Organism implements Movable, Serializable
 
     /**
      * Animal gives birth at (x, y)
-     * @param x represents x location for new child to live at
-     * @param y represents y location for new child to live at
+     * @param pair (x, y) pair of coordinates where child will live at
      */
     public abstract void giveBirthAt(Pair<Integer,Integer> pair);
 
@@ -131,9 +129,8 @@ public abstract class Animal extends Organism implements Movable, Serializable
     }
 
     /**
-     * Moves animal to (x, y)
-     * @param pair.getXCoord()  x-cor the animal should move to
-     * @param pair.getYCoord()  y-cor the animal should move to
+     * Moves animal to pair(x, y)
+     * @param pair new (x,y) location of animal
      */
     @Override
     public void moveTo(Pair<Integer,Integer> pair)

@@ -23,8 +23,7 @@ public abstract class Organism extends Entity implements Serializable
 
     /**
      * constructor of organism
-     * @param x x-location of obstacle on earth
-     * @param y y-location of obstacle on earth
+     * @param pair (x, y) pair of coordinate of obstacle on earth
      */
     protected Organism(Pair<Integer,Integer> pair) { super(pair); }
 

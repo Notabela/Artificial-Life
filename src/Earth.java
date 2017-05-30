@@ -209,8 +209,8 @@ public class Earth implements Serializable
                 continue;
             }
 
-            //passes Herbivore as a dummy, we simply need the free locations around x and y
-            ArrayList<int[]> locations = instance.getFreeLocationsAround(prevX, prevY);
+            Pair<Integer, Integer> newPair = new Pair<>(prevX, prevY);
+            ArrayList<int[]> locations = instance.getFreeLocationsAround(newPair);
             if (locations.size() == 0) //no free locations around x,y - get a new random location
             {
                 i--;
@@ -258,7 +258,8 @@ public class Earth implements Serializable
             }
             else
             {
-                ArrayList<int[]> locations = instance.getFreeLocationsAround(prevX, prevY);
+                Pair<Integer, Integer> newPair = new Pair<>(prevX, prevY);
+                ArrayList<int[]> locations = instance.getFreeLocationsAround(newPair);
                 //no free locations lets repeat this iteration and randomize
                 if (locations.size() == 0)
                 {
@@ -358,14 +359,14 @@ public class Earth implements Serializable
     }
 
     /**
-     * Returns a list of all free Locations around entity
-     * @param x x-cor
-     * @param y y-cor
+     * Returns a list of all free Locations around pair(x,y)
+     * @param pair pair(x,y)
      * @return list of 2 element integer arrays
      */
-    private ArrayList<int[]> getFreeLocationsAround(int x, int y)
+    private ArrayList<int[]> getFreeLocationsAround(Pair<Integer, Integer> pair)
     {
         ArrayList<int[]> locations = new ArrayList<>();
+        int x = pair.getXCoord(), y = pair.getYCoord();
 
         int topX = x - 1;
         int leftY = y - 1;
@@ -424,6 +425,9 @@ public class Earth implements Serializable
         return sb.toString();
     }
 
+    /**
+     * Pauses the movement of the earth
+     */
     static void pauseGameState() {
         try {
             synchronized (getInstance()) {
@@ -435,6 +439,9 @@ public class Earth implements Serializable
         }
     }
 
+    /**
+     * Resumes the movement of entities on the earth
+     */
     static void continueGameState() {
         synchronized (getInstance()) {
             getInstance().notify();
@@ -493,28 +500,15 @@ public class Earth implements Serializable
                 height = istream.readInt();
 
                 Earth.overwriteInstance((Earth)istream.readObject());
-
                 istream.close();
 
                 return true;
             } catch (FileNotFoundException e) {
-                JOptionPane.showMessageDialog(null,
-                        "Unable to load " + file.toString(),
-                        "No File Found",
-                        JOptionPane.ERROR_MESSAGE);
-                return false;
+                throw new SimulationError(SimulationError.ErrorType.BAD_SAVE_FILE);
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(null,
-                        "Unable to load " + file.toString(),
-                        "IO Exception",
-                        JOptionPane.ERROR_MESSAGE);
-                return false;
+                throw new SimulationError(SimulationError.ErrorType.BAD_SAVE_FILE);
             } catch (ClassNotFoundException e) {
-                JOptionPane.showMessageDialog(null,
-                        "Corrupt Save File",
-                        "File Error",
-                        JOptionPane.ERROR_MESSAGE);
-                throw( new RuntimeException()); //Game should Quit
+                throw new SimulationError(SimulationError.ErrorType.BAD_SAVE_FILE);
             }
         }
 
@@ -535,18 +529,14 @@ public class Earth implements Serializable
                 ostream.writeObject(getInstance());
 
                ostream.close();
+               return true;
             } catch (FileNotFoundException e)
             {
-                System.out.println("Error: Unable to save GameState");
-                ///GUI.displayError("Error: " + file.toString() + " not found")
-                return false;
+                throw new SimulationError(SimulationError.ErrorType.UNABLE_TO_SAVE);
             } catch (IOException e)
             {
-                System.out.println("Error: unable to save to" + file.toString());
-                ///GUI.displayError("Error: ");
-                return false;
+                throw new SimulationError(SimulationError.ErrorType.UNABLE_TO_SAVE);
             }
-            return false;
         }
     }
 

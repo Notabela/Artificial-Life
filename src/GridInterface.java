@@ -1,3 +1,5 @@
+import javafx.beans.property.adapter.JavaBeanObjectProperty;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -70,7 +72,15 @@ public class GridInterface extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //Save the game
-                Earth.saveGameState();
+
+                try
+                {
+                    Earth.saveGameState();
+                } catch (SimulationError error)
+                {
+                    JOptionPane.showMessageDialog(null, error.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+
                 JOptionPane.showMessageDialog(null,"Game has been saved!");
             }
         });

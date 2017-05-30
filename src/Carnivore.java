@@ -9,8 +9,7 @@ public class Carnivore extends Animal
 {
     /**
      * Constructor of Carnivore
-     * @param x x-location of obstacle on earth
-     * @param y y-location of obstacle on earth
+     * @param pair pair(x,y) of animals location
      */
     public Carnivore(Pair<Integer,Integer> pair) { super(pair); }
 
@@ -43,7 +42,7 @@ public class Carnivore extends Animal
         {
             energy += ((Herbivore) entity).energy; //animal obtains prey's energy
             int newX = entity.getX(), newY = entity.getY();
-            Pair<Integer,Integer> newPair = new Pair<Integer,Integer>(newX,newY);
+            Pair<Integer,Integer> newPair = new Pair<>(newX,newY);
             ((Herbivore) entity).die();
             feedCount++;
             moveTo(newPair);
@@ -54,8 +53,7 @@ public class Carnivore extends Animal
 
     /**
      * Carnivore gives birth at (x, y)
-     * @param x x-cor of child
-     * @param y y-cor of child
+     * @param pair pair(x,y) of child
      */
     @Override
     public void giveBirthAt(Pair<Integer,Integer> pair)
