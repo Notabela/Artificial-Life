@@ -11,7 +11,7 @@ public class Pair <X, Y>
     private Y yCoord;
 
     /**
-     * Public Constructor for Piar
+     * Public Constructor for Pair
      * @param xCoordinate first object of the pair
      * @param yCoordinate second object of the pair
      */

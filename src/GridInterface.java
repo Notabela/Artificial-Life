@@ -1,20 +1,19 @@
-import javafx.beans.property.adapter.JavaBeanObjectProperty;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
 /**
- * Created by socra_000 on 5/12/2017.
+ * GridInterface.java
+ * Purpose: defines a GUI for displaying the Simulation
+ *
+ * @author Daniel Obeng & Socratis Katehis
+ * @version 3.0 4/28/2017
  */
 public class GridInterface extends JFrame {
 
     private JButton saveButton = new JButton("Save");
     private JButton exitButton = new JButton("Exit");
-    private JButton pauseButton = new JButton("Pause");
-    private JButton playButton = new JButton("Play");
 
     //Add more images for obstacles. Maximum size 50px x 50px
     private static final String[] object = {
@@ -43,45 +42,26 @@ public class GridInterface extends JFrame {
     {
 
         grid.setLayout(new GridLayout(Earth.width, Earth.height));
-        panel.setLayout(new GridLayout(0,4));
+        panel.setLayout(new GridLayout(0,2));
 
         addObjects(grid);
 
-        panel.add(playButton);
-        panel.add(pauseButton);
         panel.add(saveButton);
         panel.add(exitButton);
-
-        playButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //Continue the game
-                Earth.continueGameState();
-            }
-        });
-
-        pauseButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //Pause the game temporarily
-                Earth.pauseGameState();
-            }
-        });
 
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //Save the game
-
                 try
                 {
                     Earth.saveGameState();
+                    JOptionPane.showMessageDialog(null,"Game has been saved!");
                 } catch (SimulationError error)
                 {
                     JOptionPane.showMessageDialog(null, error.toString(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
 
-                JOptionPane.showMessageDialog(null,"Game has been saved!");
             }
         });
 
@@ -104,7 +84,7 @@ public class GridInterface extends JFrame {
         for (int i = 0; i < Earth.width; i++) {
             for (int j = 0; j < Earth.height; j++) {
 
-                Entity entity =  Organism.earth.getEntityAt(i, j);
+                Entity entity =  Earth.getInstance().getEntityAt(i, j);
 
                 if (entity instanceof Herbivore) {
                     buttons[i] = new JButton((icons[0]));
@@ -191,7 +171,8 @@ public class GridInterface extends JFrame {
         }
     }
 
-    public void renew() {
+    public void renew()
+    {
 
         this.grid.removeAll();
 

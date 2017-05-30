@@ -16,46 +16,60 @@ public class Simulation
         newInitialization();
     }
 
-     private static void newInitialization() {
-         int dialogButton = JOptionPane.YES_NO_OPTION;
-
+     private static void newInitialization()
+     {
          int dialogResult = JOptionPane.showConfirmDialog(null,
-                 "Would You Like to Load a Previous Save?","Artificial Life",dialogButton);
-         if(dialogResult == JOptionPane.YES_OPTION){
+                 "If there is a previous save you'd like to continue from, choose YES",
+                 "Artificial Life",JOptionPane.YES_NO_OPTION);
+
+         if(dialogResult == JOptionPane.YES_OPTION)
+         {
              boolean noError = false;
-             try {
+             try
+             {
                  Earth.LoadGameState();
                  noError = true;
-             } catch (NullPointerException noFile) {
-                 JOptionPane.showMessageDialog(null,
-                         "No file was selected to load!",
-                         "File Error",
-                         JOptionPane.ERROR_MESSAGE);
-             } catch (SimulationError error) {
+                 Simulation.beginSimulation();
+             } catch (SimulationError error)
+             {
                  JOptionPane.showMessageDialog(null,
                          error.toString(),
                          "File Error",
                          JOptionPane.ERROR_MESSAGE);
              }
-             if (noError && Earth.LoadGameState()) {
-                 Simulation.beginSimulation();
-             }
+             if (!noError) startNewGame();
          }
-         else {
-             String firstText = JOptionPane.showInputDialog("Enter desired Earth width (>= 5)");
-             String secondText = JOptionPane.showInputDialog("Enter desired Earth height (>= 5)");
+         else startNewGame();
+    }
 
-             int userWidth = Integer.parseInt(firstText);
-             int userHeight = Integer.parseInt(secondText);
+    static void startNewGame()
+    {
+        String firstText = JOptionPane.showInputDialog("Enter desired Earth width (>= 5)");
+        if (firstText == null) System.exit(0);
 
-             Earth.initialize(userWidth, userHeight);
+        String secondText = JOptionPane.showInputDialog("Enter desired Earth height (>= 5)");
+        if (secondText == null) System.exit(0);
 
-             beginSimulation();
-         }
+        int userWidth = Integer.parseInt(firstText);
+        int userHeight = Integer.parseInt(secondText);
+
+        //Bad Input - Game will Exist
+        if(userWidth < 5 || userHeight < 5)
+        {
+            JOptionPane.showMessageDialog(null,
+                    "Width or Height < 5, Game will exit", "Fatal Error",
+                    JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
+        }
+
+        Earth.initialize(userWidth, userHeight);
+
+        beginSimulation();
     }
 
 
-    static void beginSimulation() {
+    static void beginSimulation()
+    {
         GridInterface frame = new GridInterface();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.addComponents(frame.getContentPane());
@@ -66,8 +80,8 @@ public class Simulation
         for(int iteration = 1; iteration <= maxIterations; iteration++)
         {
             Earth.simulate(iteration);
-
             frame.renew();
+            //code to slow down game a bit
             try
             {
                 Thread.sleep(1000);

@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.io.Serializable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,12 +36,12 @@ public class Earth implements Serializable
     private static int herbivoreIter = MIN_HERB_ITER + rand.nextInt(MAX_HERB_ITER - MIN_HERB_ITER + 1);
     private static int carnivoreIter = MIN_CARN_ITER + rand.nextInt(MAX_CARN_ITER - MIN_CARN_ITER + 1);
 
-    static int width  = 20; // Width of earth - default size is 20
-    static int height = 20; // Height of earth - default size is 20
+    public static int width  = 20; // Width of earth - default size is 20 for testing
+    public static int height = 20; // Height of earth - default size is 20 for testing
 
     private static Earth instance; //reference to the only instance of earth in program
+    private static SaveGame save = new SaveGame(); //save game object to enable saving of current state of simulation
 
-    private SaveGame save = new SaveGame(); //save game object to enable saving of current state of simulation
     private Entity[][] grid;
 
     /**
@@ -53,7 +52,11 @@ public class Earth implements Serializable
     /**
      * Private copy constructor to allow overwriting of earth
      */
-    private Earth(Earth other) { grid = other.grid; }
+    private Earth(Earth other)
+    {
+        grid = other.grid;
+        instance = this;
+    }
 
     /**
      * Get the single Earth instance
@@ -67,8 +70,7 @@ public class Earth implements Serializable
 
     /**
      * Gets entity at location (x, y)
-     * @param x x-cor of organism
-     * @param y y-cor of organism
+     * @param pair (x,y) coordinate of entity
      * @return Organism at (x, y)
      */
     Entity getEntityAt(Pair<Integer,Integer> pair) { return grid[pair.getXCoord()][pair.getYCoord()]; }
@@ -426,44 +428,17 @@ public class Earth implements Serializable
     }
 
     /**
-     * Pauses the movement of the earth
-     */
-    static void pauseGameState() {
-        try {
-            synchronized (getInstance()) {
-                getInstance().wait();
-            }
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Resumes the movement of entities on the earth
-     */
-    static void continueGameState() {
-        synchronized (getInstance()) {
-            getInstance().notify();
-        }
-    }
-
-    /**
      * Saves current game State to a binary file
      */
-    static void saveGameState()
+    static boolean saveGameState()
     {
-        getInstance().save.saveGameState();
+        return save.saveGameState();
     }
 
     /**
      * Reads current game State from a saved binary file
      */
-    static boolean LoadGameState()
-    {
-        getInstance().save.loadFromSave();
-        return getInstance().save.loadFromSave();
-    }
+    static boolean LoadGameState() { return save.loadFromSave(); }
 
     /**
      * static method to overwrite earth's single instance with another object
@@ -477,7 +452,7 @@ public class Earth implements Serializable
     /**
      * inner SaveGame class to enable saving earth's instance and necessary static variables for loading later
      */
-    class SaveGame implements Serializable
+    static class SaveGame implements Serializable
     {
         private String fileName;
         private File file;
@@ -499,10 +474,11 @@ public class Earth implements Serializable
                 width = istream.readInt();
                 height = istream.readInt();
 
-                Earth.overwriteInstance((Earth)istream.readObject());
+                overwriteInstance((Earth)istream.readObject());
                 istream.close();
 
                 return true;
+
             } catch (FileNotFoundException e) {
                 throw new SimulationError(SimulationError.ErrorType.BAD_SAVE_FILE);
             } catch (IOException e) {
@@ -528,8 +504,8 @@ public class Earth implements Serializable
                 //then Write game objects
                 ostream.writeObject(getInstance());
 
-               ostream.close();
-               return true;
+                ostream.close();
+                return true;
             } catch (FileNotFoundException e)
             {
                 throw new SimulationError(SimulationError.ErrorType.UNABLE_TO_SAVE);

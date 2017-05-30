@@ -18,8 +18,8 @@ public abstract class Animal extends Organism implements Movable, Serializable
     private static final double ENERGY_LOST_PER_MOVE = 0.2; // energy animal loses per move
     static final int MAX_ENERGY = 30 + rand.nextInt(60 - 30 + 1);  // energy at which animal can no longer feed
     private static final int CAN_BIRTH_ENERGY = 6 + rand.nextInt(10 - 6 + 1);   // energy at which animal can start giving birth
-    private static final int LOW_CAN_BIRTH_AGE = 5 + rand.nextInt(10 - 5 + 1);  // lowest age at which animal can give birth
-    private static final int HIGH_CAN_BIRTH_AGE = 50 + rand.nextInt(100 - 30 + 1);  // highest age at which animal can still give birth
+    private static final int LOW_CAN_BIRTH_AGE = 10 + rand.nextInt(15 - 10 + 1);  // lowest age at which animal can give birth
+    private static final int HIGH_CAN_BIRTH_AGE = 50 + rand.nextInt(100 - 50 + 1);  // highest age at which animal can still give birth
 
     //helper bool to keep track of if animal was moved during the current iteration
     //This will ensure that organism isn't moved twice in the earth array at each iteration
